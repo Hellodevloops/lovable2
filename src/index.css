@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@layer base {
+  :root {
+    /* Warm Cream Palette */
+    --background: 45 33% 97%;
+    --foreground: 30 15% 25%;
+    
+    --card: 45 30% 95%;
+    --card-foreground: 30 15% 25%;
+    
+    --popover: 45 30% 95%;
+    --popover-foreground: 30 15% 25%;
+    
+    /* Taupe/Brown Primary */
+    --primary: 30 20% 55%;
+    --primary-foreground: 45 33% 97%;
+    
+    /* Soft Cream Secondary */
+    --secondary: 40 25% 92%;
+    --secondary-foreground: 30 15% 25%;
+    
+    --muted: 40 20% 90%;
+    --muted-foreground: 30 10% 50%;
+    
+    /* Warm Accent */
+    --accent: 35 25% 85%;
+    --accent-foreground: 30 15% 25%;
+    
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 45 33% 97%;
+    
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 30 20% 55%;
+    
+    --radius: 0.25rem;
+    
+    /* Custom LuxeHire Variables */
+    --taupe: 30 20% 55%;
+    --taupe-light: 30 18% 70%;
+    --taupe-dark: 30 22% 40%;
+    --cream: 45 33% 97%;
+    --cream-dark: 40 25% 92%;
+    --ivory: 45 40% 94%;
+    
+    /* Typography */
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    
+    /* Gradients */
+    --gradient-taupe: linear-gradient(135deg, hsl(30, 20%, 55%) 0%, hsl(30, 18%, 65%) 50%, hsl(30, 20%, 55%) 100%);
+    --gradient-cream: linear-gradient(180deg, hsl(45, 33%, 97%) 0%, hsl(40, 25%, 94%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(45, 30%, 96%) 0%, hsl(40, 25%, 93%) 100%);
+    --gradient-hero: radial-gradient(ellipse at 50% 0%, hsl(35, 25%, 90%) 0%, hsl(45, 33%, 97%) 60%);
+    
+    /* Shadows */
+    --shadow-taupe: 0 4px 30px -5px hsla(30, 20%, 55%, 0.2);
+    --shadow-card: 0 25px 50px -12px hsla(30, 20%, 30%, 0.1);
+    --shadow-elegant: 0 10px 40px -10px hsla(30, 20%, 30%, 0.15);
+    
+    /* Sidebar */
+    --sidebar-background: 45 30% 95%;
+    --sidebar-foreground: 30 15% 25%;
+    --sidebar-primary: 30 20% 55%;
+    --sidebar-primary-foreground: 45 33% 97%;
+    --sidebar-accent: 40 25% 90%;
+    --sidebar-accent-foreground: 30 15% 25%;
+    --sidebar-border: 35 20% 85%;
+    --sidebar-ring: 30 20% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+  }
+}
+
+@layer components {
+  /* Taupe Text Gradient */
+  .text-gradient-taupe {
+    background: var(--gradient-taupe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Taupe Underline Animation */
+  .taupe-underline {
+    position: relative;
+  }
+  
+  .taupe-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gradient-taupe);
+    transition: width 0.4s ease;
+  }
+  
+  .taupe-underline:hover::after {
+    width: 100%;
+  }
+  
+  /* Elegant Card */
+  .luxury-card {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .luxury-card:hover {
+    border-color: hsl(var(--taupe) / 0.4);
+    box-shadow: var(--shadow-taupe);
+    transform: translateY(-4px);
+  }
+  
+  /* Section Divider */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, hsl(var(--taupe) / 0.3) 50%, transparent 100%);
+  }
+  
+  /* Elegant Button */
+  .btn-luxury {
+    background: transparent;
+    border: 1px solid hsl(var(--taupe));
+    color: hsl(var(--taupe));
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 1rem 2.5rem;
+    transition: all 0.4s ease;
+  }
+  
+  .btn-luxury:hover {
+    background: hsl(var(--taupe));
+    color: hsl(var(--cream));
+    box-shadow: var(--shadow-taupe);
+  }
+  
+  .btn-luxury-filled {
+    background: hsl(var(--taupe));
+    border: 1px solid hsl(var(--taupe));
+    color: hsl(var(--cream));
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 1rem 2.5rem;
+    transition: all 0.4s ease;
+  }
+  
+  .btn-luxury-filled:hover {
+    background: hsl(var(--taupe-dark));
+    box-shadow: var(--shadow-taupe);
+  }
+  
+  /* Decorative Corner */
+  .corner-decoration::before,
+  .corner-decoration::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: hsl(var(--taupe) / 0.3);
+    transition: all 0.4s ease;
+  }
+  
+  .corner-decoration::before {
+    top: 0;
+    left: 0;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  
+  .corner-decoration::after {
+    bottom: 0;
+    right: 0;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+  
+  .corner-decoration:hover::before,
+  .corner-decoration:hover::after {
+    border-color: hsl(var(--taupe));
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+  
+  .tracking-luxury {
+    letter-spacing: 0.2em;
+  }
+  
+  .tracking-wide-luxury {
+    letter-spacing: 0.15em;
+  }
+  
+  .text-taupe {
+    color: hsl(var(--taupe));
+  }
+  
+  .bg-cream-dark {
+    background-color: hsl(var(--cream-dark));
+  }
+  
+  .bg-ivory {
+    background-color: hsl(var(--ivory));
+  }
+}
