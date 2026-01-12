@@ -29,7 +29,7 @@ const Index = () => {
       <Footer />
       
       {/* WhatsApp Quick Contact - Update phone number as needed */}
-      <WhatsAppButton phoneNumber="916355523072" />
+      {/* <WhatsAppButton phoneNumber="916355523072" /> */}
     </div>
   );
 };

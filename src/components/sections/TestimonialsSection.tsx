@@ -6,21 +6,15 @@ import { Quote } from "lucide-react";
 const testimonials = [
   {
     quote:
-      "LuxeHire grasped our brand DNA from the outset. They presented exceptional candidates who genuinely embody our luxury ethos.",
-    author: "Brand Director",
-    company: "International Fashion House",
+      "I've had the pleasure of working with Romil, and I must say his recruitment expertise truly stands out. He has an excellent understanding of requirements and always ensures that the profiles shared are well-aligned with the role. Romil manages the entire process seamlessly — from understanding the need to connecting with candidates end-to-end. His professional approach, responsiveness, and commitment to delivering quality work make him a reliable recruitment consultant to collaborate with",
+    author: "Tavishi Suneja",
+    company: "HR at Reliance Brands Ltd.",
   },
   {
     quote:
-      "Their discretion and professionalism proved invaluable during our executive search. I recommend them unreservedly to luxury brands.",
-    author: "Head of Human Resources",
-    company: "Premier Jewellery Maison",
-  },
-  {
-    quote:
-      "The team's profound understanding of the luxury landscape helped us secure the ideal leader for our flagship boutique.",
-    author: "Founder",
-    company: "Luxury Retail Group",
+      "I've had the pleasure of partnering with Romil Trivedi for over two years, and he is a top tier professional in luxury retail and corporate recruitment. His deep understanding of the industry and ability to consistently deliver outstanding talent has been a tremendous asset. I highly recommend Romil to any brand looking for a strategic and reliable partner to build a high performing team.",
+    author: "Kajal Tanwar",
+    company: "Reliance Brands Limited | Bestseller Retail India | Oberoi Group of Hotels and Resorts",
   },
 ];
 
@@ -49,7 +43,7 @@ export const TestimonialsSection = () => {
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}

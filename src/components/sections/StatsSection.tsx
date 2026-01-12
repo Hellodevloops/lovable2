@@ -20,7 +20,7 @@ const AnimatedCounter = ({ end, suffix = "", duration = 2, isInView }: CounterPr
 
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      const progress = Math.min((timestamp - startTime) / (duration * 1500), 1);
       
       // Easing function for smooth animation
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);

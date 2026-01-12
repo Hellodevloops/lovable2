@@ -19,8 +19,8 @@ export const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative container mx-auto px-6 lg:px-12 pt-20">
-        <div className="max-w-3xl">
+      <div className="relative container  mx-auto px-6 lg:px-12 pt-20">
+        <div className="max-w-3xl mx-auto">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -34,7 +34,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground font-medium leading-[1.1] mb-8"
+            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-black font-medium leading-[1.1] mb-8"
           >
             Curating Talent for the{" "}
             <span className="text-primary italic">World's Finest</span>{" "}
@@ -45,7 +45,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-muted-foreground text-base md:text-lg max-w-xl mb-10 leading-relaxed"
+            className="text-foreground text-base md:text-lg max-w-xl mb-10 leading-relaxed"
           >
             Connecting iconic luxury brands with exceptional professionals across fashion, retail, jewelry, and lifestyle.
           </motion.p>
@@ -54,7 +54,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-start gap-4"
+            className="flex flex-col sm:flex-row items-start gap-4 "
           >
             <a 
               href="#contact" 
