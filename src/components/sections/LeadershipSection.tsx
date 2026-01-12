@@ -3,20 +3,25 @@ import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Linkedin, Mail } from "lucide-react";
 
-const leaders = [
+import pranshuTiwariImage from "../../assets/Pranshu-Tiwari.jpeg";
+import romilTrivediImage from "../../assets/Romil-Trivedi.jpeg";
+
+ const leaders = [
   {
     name: "Pranshu Tiwari",
-    role: "Co-Founder & Managing Partner",
-    bio: "With over a decade of experience in luxury retail and executive search, Pranshu brings deep industry relationships and an unwavering commitment to excellence. His network spans leading fashion and jewellery houses across Asia and Europe.",
+    role: "Founder",
+    bio: "Pranshu Tiwari brings a strategic, brand-first approach to luxury talent advisory, working across fashion, jewellery, watches, beauty, and lifestyle maisons. With experience in global market hiring and brand partnerships, he focuses on aligning top-tier talent with long-term brand vision. Pranshu is known for building strong leadership pipelines and fostering meaningful collaborations within the luxury ecosystem.",
     email: "pranshu@luxehire.co",
-    linkedin: "#",
+    linkedin: "https://www.linkedin.com/in/pranshu-tiwari-560610267/",
+    image: pranshuTiwariImage,
   },
   {
     name: "Romil Trivedi",
-    role: "Co-Founder & Partner",
-    bio: "Romil specialises in strategic talent acquisition and leadership assessment. He has successfully placed senior executives across premium retail, hospitality, and lifestyle brands on a global scale.",
+    role: "Founder & CEO",
+    bio: "Romil Trivedi is a luxury recruitment specialist with expertise in leadership and frontline hiring across global premium and luxury retail markets. With a strong understanding of brand DNA, customer experience, and retail operations, he partners with international luxury maisons and high-growth brands worldwide to deliver exceptional talent with speed, precision, and quality. Romil is recognised for his global network, market insight, and commitment to excellence.",
     email: "romil@luxehire.co",
-    linkedin: "#",
+    linkedin: "https://www.linkedin.com/in/romil-trivedi-4b5504231/",
+    image: romilTrivediImage,
   },
 ];
 
@@ -58,11 +63,13 @@ export const LeadershipSection = () => {
             >
               {/* Placeholder for Photo */}
               <div className="h-48 md:h-64 bg-gradient-to-br from-secondary to-accent flex items-center justify-center relative overflow-hidden">
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                  <span className="font-serif text-2xl md:text-3xl text-primary">
-                    {leader.name.split(" ").map((n) => n[0]).join("")}
-                  </span>
-                </div>
+                <img
+                  src={leader.image}
+                  alt={leader.name}
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
 
@@ -82,6 +89,8 @@ export const LeadershipSection = () => {
                   </a>
                   <a
                     href={leader.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="p-2 border border-border rounded-sm hover:border-primary hover:text-primary transition-colors duration-300"
                     aria-label={`${leader.name}'s LinkedIn`}
                   >

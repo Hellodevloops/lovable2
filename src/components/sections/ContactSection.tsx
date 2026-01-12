@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState } from "react";
-import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 export const ContactSection = () => {
@@ -9,6 +9,29 @@ export const ContactSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      if (file.size > maxSize) {
+        toast.error("File size must be less than 10MB");
+        e.target.value = '';
+        return;
+      }
+      
+      // Validate file type (PDF, DOC, DOCX)
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (allowedTypes.includes(file.type)) {
+        setResumeFile(file);
+      } else {
+        toast.error("Please upload a PDF or Word document");
+        e.target.value = '';
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,6 +42,7 @@ export const ContactSection = () => {
     toast.success("Thank you. We'll be in touch shortly.");
     setTimeout(() => {
       setIsSubmitted(false);
+      setResumeFile(null);
       (e.target as HTMLFormElement).reset();
     }, 3000);
   };
@@ -71,7 +95,18 @@ export const ContactSection = () => {
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Phone</p>
                   <a href="tel:+916355523072" className="text-sm font-medium hover:text-primary transition-colors">
-                    +91 6355 523 072
+                    +91 6355 523 076
+                  </a>
+                </div>
+              </div>
+                <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-sm bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">LuxeHire</p>
+                  <a href="tel:+916355523072" className="text-sm font-medium hover:text-primary transition-colors">
+                    +91 6358217266
                   </a>
                 </div>
               </div>
@@ -117,6 +152,30 @@ export const ContactSection = () => {
                 placeholder="How can we help?"
                 className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors resize-none"
               />
+              {/* <div className="relative">
+                <input
+                  type="file"
+                  id="resume"
+                  name="resume"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="resume"
+                  className="flex items-center gap-3 w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-muted-foreground/70 hover:border-primary transition-colors cursor-pointer"
+                >
+                  <Upload className="w-4 h-4" />
+                  {resumeFile ? (
+                    <div className="flex items-center gap-2 flex-1">
+                      <FileText className="w-4 h-4 text-primary" />
+                      <span className="text-foreground truncate">{resumeFile.name}</span>
+                    </div>
+                  ) : (
+                    <span>Upload Resume (PDF, DOC, DOCX - Max 10MB)</span>
+                  )}
+                </label>
+              </div> */}
               <button
                 type="submit"
                 disabled={isSubmitting || isSubmitted}

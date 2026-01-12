@@ -6,21 +6,15 @@ import { Quote } from "lucide-react";
 const testimonials = [
   {
     quote:
-      "LuxeHire grasped our brand DNA from the outset. They presented exceptional candidates who genuinely embody our luxury ethos.",
-    author: "Brand Director",
-    company: "International Fashion House",
+      "Working with LuxeHire has been a seamless experience. Their deep understanding of hiring requirements and ability to deliver precisely aligned profiles sets them apart. The end-to-end recruitment process is handled with clarity, efficiency, and professionalism. Consistent responsiveness and a strong focus on quality make LuxeHire a trusted partner for luxury recruitment.",
+    author: "Tavishi Suneja",
+    company: "HR at Reliance Brands Ltd.",
   },
   {
     quote:
-      "Their discretion and professionalism proved invaluable during our executive search. I recommend them unreservedly to luxury brands.",
-    author: "Head of Human Resources",
-    company: "Premier Jewellery Maison",
-  },
-  {
-    quote:
-      "The team's profound understanding of the luxury landscape helped us secure the ideal leader for our flagship boutique.",
-    author: "Founder",
-    company: "Luxury Retail Group",
+      "It has been a pleasure partnering with LuxeHire over the past two years. Their expertise in luxury retail and corporate recruitment is truly top-tier. With a deep understanding of the industry and a consistent ability to deliver high-quality talent, LuxeHire has proven to be a valuable hiring partner. I highly recommend LuxeHire to brands seeking a strategic, reliable recruitment partner to build high-performing teams.",
+    author: "Kajal Tanwar",
+    company: "Reliance Brands Limited | Bestseller Retail India | Oberoi Group of Hotels and Resorts",
   },
 ];
 
@@ -49,7 +43,7 @@ export const TestimonialsSection = () => {
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
