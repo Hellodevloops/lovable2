@@ -6,13 +6,13 @@ import { Quote } from "lucide-react";
 const testimonials = [
   {
     quote:
-      "I've had the pleasure of working with Romil, and I must say his recruitment expertise truly stands out. He has an excellent understanding of requirements and always ensures that the profiles shared are well-aligned with the role. Romil manages the entire process seamlessly — from understanding the need to connecting with candidates end-to-end. His professional approach, responsiveness, and commitment to delivering quality work make him a reliable recruitment consultant to collaborate with",
+      "Working with LuxeHire has been a seamless experience. Their deep understanding of hiring requirements and ability to deliver precisely aligned profiles sets them apart. The end-to-end recruitment process is handled with clarity, efficiency, and professionalism. Consistent responsiveness and a strong focus on quality make LuxeHire a trusted partner for luxury recruitment.",
     author: "Tavishi Suneja",
     company: "HR at Reliance Brands Ltd.",
   },
   {
     quote:
-      "I've had the pleasure of partnering with Romil Trivedi for over two years, and he is a top tier professional in luxury retail and corporate recruitment. His deep understanding of the industry and ability to consistently deliver outstanding talent has been a tremendous asset. I highly recommend Romil to any brand looking for a strategic and reliable partner to build a high performing team.",
+      "It has been a pleasure partnering with LuxeHire over the past two years. Their expertise in luxury retail and corporate recruitment is truly top-tier. With a deep understanding of the industry and a consistent ability to deliver high-quality talent, LuxeHire has proven to be a valuable hiring partner. I highly recommend LuxeHire to brands seeking a strategic, reliable recruitment partner to build high-performing teams.",
     author: "Kajal Tanwar",
     company: "Reliance Brands Limited | Bestseller Retail India | Oberoi Group of Hotels and Resorts",
   },

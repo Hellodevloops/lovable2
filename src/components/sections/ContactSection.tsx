@@ -152,7 +152,7 @@ export const ContactSection = () => {
                 placeholder="How can we help?"
                 className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors resize-none"
               />
-              <div className="relative">
+              {/* <div className="relative">
                 <input
                   type="file"
                   id="resume"
@@ -175,7 +175,7 @@ export const ContactSection = () => {
                     <span>Upload Resume (PDF, DOC, DOCX - Max 10MB)</span>
                   )}
                 </label>
-              </div>
+              </div> */}
               <button
                 type="submit"
                 disabled={isSubmitting || isSubmitted}
