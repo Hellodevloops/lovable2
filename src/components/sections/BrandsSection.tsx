@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 
 const brands = [
-  { name: "Tiffany & Co.", logo: "/assets/brands/tiffany-co.png" },
+  { name: "Tiffany & Co.", logo: "/assets/brands/tiffany-co-logo-.png" },
   { name: "Christian Louboutin", logo: "/assets/brands/christian-louboutin-logo-png_seeklogo-320816-removebg-preview.png", logoClassName: "scale-[2.1]" },
   { name: "Galeries Lafayette", logo: "/assets/brands/Galeries-Lafayette-logo-removebg-preview.png", logoClassName: "scale-[2.4]" },
   { name: "Sabyasachi", logo: "/assets/brands/sabyasachi.com_logo27-removebg-preview.png", logoClassName: "scale-[2]" },
@@ -30,6 +30,9 @@ export const BrandsSection = () => {
   const [manualControl, setManualControl] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(0);
   const marqueeRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number>();
+  const lastTimeRef = useRef<number>(0);
+  const brandElementRef = useRef<HTMLDivElement | null>(null);
   const [brandWidth, setBrandWidth] = useState(0);
   const [manualOffset, setManualOffset] = useState(0);
   const [animationPosition, setAnimationPosition] = useState(0);
@@ -42,7 +45,7 @@ export const BrandsSection = () => {
     animationPositionRef.current = animationPosition;
   }, [animationPosition]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setManualControl(true);
     setIsPaused(true);
     let newPosition = currentPosition - 1;
@@ -53,16 +56,19 @@ export const BrandsSection = () => {
     }
 
     const newOffset = newPosition * brandWidth;
+    
+    // Batch state updates to prevent re-renders
     setCurrentPosition(newPosition);
     setManualOffset(newOffset);
     setAnimationPosition(newOffset);
+    
     setTimeout(() => {
       setManualControl(false);
       setIsPaused(false);
     }, 1000);
-  };
+  }, [currentPosition, brandWidth]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setManualControl(true);
     setIsPaused(true);
     let newPosition = currentPosition + 1;
@@ -73,50 +79,73 @@ export const BrandsSection = () => {
     }
 
     const newOffset = newPosition * brandWidth;
+    
+    // Batch state updates to prevent re-renders
     setCurrentPosition(newPosition);
     setManualOffset(newOffset);
     setAnimationPosition(newOffset);
+    
     setTimeout(() => {
       setManualControl(false);
       setIsPaused(false);
     }, 1000);
-  };
+  }, [currentPosition, brandWidth]);
 
-  // Calculate brand width on mount
+  // Calculate brand width on mount with debouncing
   useEffect(() => {
     const calculateBrandWidth = () => {
-      const brandElement = document.querySelector('.brand-item');
-      if (brandElement) {
-        setBrandWidth(brandElement.clientWidth);
+      if (brandElementRef.current) {
+        setBrandWidth(brandElementRef.current.clientWidth);
       }
     };
 
+    const debouncedCalculate = () => {
+      requestAnimationFrame(calculateBrandWidth);
+    };
+
+    // Initial calculation
     calculateBrandWidth();
-    window.addEventListener('resize', calculateBrandWidth);
-    return () => window.removeEventListener('resize', calculateBrandWidth);
+    
+    window.addEventListener('resize', debouncedCalculate, { passive: true });
+    return () => window.removeEventListener('resize', debouncedCalculate);
   }, []);
 
-  // Track animation position for seamless loop continuation
+  // Optimized animation loop using requestAnimationFrame
   useEffect(() => {
     if (!manualControl && !isPaused && brandWidth > 0 && isInView) {
       let currentPosition = manualOffset;
-
-      const interval = setInterval(() => {
-        setAnimationPosition(prev => {
-          const totalWidth = brandWidth * brands.length * 2; // Both sets for true infinite loop
-          const speed = (totalWidth / 150000) * 16; // 16ms per frame, 45s duration
+      
+      const animate = (timestamp: number) => {
+        if (!lastTimeRef.current) lastTimeRef.current = timestamp;
+        
+        const deltaTime = timestamp - lastTimeRef.current;
+        
+        if (deltaTime >= 16) { // Cap at ~60fps
+          const baseWidth = 280; // Fixed base width for consistent speed
+          const totalWidth = baseWidth * brands.length * 2;
+          const speed = (totalWidth / 100000) * deltaTime; // Consistent speed across devices
           currentPosition -= speed;
 
           // Create infinite loop by wrapping around
-          if (currentPosition <= manualOffset - (brandWidth * brands.length)) {
+          if (currentPosition <= manualOffset - (baseWidth * brands.length)) {
             currentPosition = manualOffset;
           }
 
-          return currentPosition;
-        });
-      }, 16); // ~60fps
+          setAnimationPosition(currentPosition);
+          lastTimeRef.current = timestamp;
+        }
+        
+        animationFrameRef.current = requestAnimationFrame(animate);
+      };
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
 
-      return () => clearInterval(interval);
+      return () => {
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+        lastTimeRef.current = 0;
+      };
     }
   }, [manualControl, isPaused, brandWidth, isInView, manualOffset]);
 
@@ -127,21 +156,21 @@ export const BrandsSection = () => {
     }
   }, [manualControl, isPaused, manualOffset, brandWidth]);
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     if (manualControl) return;
     const pos = animationPositionRef.current;
     setManualOffset(pos);
     setAnimationPosition(pos);
     setIsPaused(true);
-  };
+  }, [manualControl]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     if (manualControl) return;
     const pos = animationPositionRef.current;
     setManualOffset(pos);
     setAnimationPosition(pos);
     setIsPaused(false);
-  };
+  }, [manualControl]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -160,13 +189,14 @@ export const BrandsSection = () => {
     setIsDragging(true);
   };
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+    e.preventDefault();
     const deltaX = e.clientX - dragStartXRef.current;
     const pos = dragStartOffsetRef.current + deltaX;
     setManualOffset(pos);
     setAnimationPosition(pos);
-  };
+  }, [isDragging]);
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging) return;
@@ -258,6 +288,7 @@ export const BrandsSection = () => {
             {brands.map((brand, index) => (
               <div
                 key={`first-${index}`}
+                ref={index === 0 ? brandElementRef : undefined}
                 className="brand-item flex w-[240px] shrink-0 items-center justify-center px-10 md:w-[260px] md:px-12 lg:w-[280px]"
               >
                 <img
