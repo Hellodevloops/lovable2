@@ -33,7 +33,7 @@ export const Footer = () => {
           {/* Social */}
           <div className="flex items-center gap-3">
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/company/luxehire/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
@@ -41,7 +41,7 @@ export const Footer = () => {
             >
               <Linkedin size={14} />
             </a>
-            <a
+            {/* <a
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -49,7 +49,7 @@ export const Footer = () => {
               aria-label="Instagram"
             >
               <Instagram size={14} />
-            </a>
+            </a> */}
             <a
               href="mailto:hello@luxehire.co"
               className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"

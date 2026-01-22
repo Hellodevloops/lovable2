@@ -3,8 +3,8 @@ import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Linkedin, Mail } from "lucide-react";
 
-import pranshuTiwariImage from "../../assets/Pranshu-Tiwari.jpeg";
-import romilTrivediImage from "../../assets/Romil-Trivedi.jpeg";
+import pranshuTiwariImage from "/assets/Pranshu-Tiwari.jpeg";
+import romilTrivediImage from "/assets/RomilTrivedi.jpeg";
 
  const leaders = [
   {
@@ -62,7 +62,7 @@ export const LeadershipSection = () => {
               className="luxury-card rounded-sm overflow-hidden group"
             >
               {/* Placeholder for Photo */}
-              <div className="h-48 md:h-64 bg-gradient-to-br from-secondary to-accent flex items-center justify-center relative overflow-hidden">
+              <div className="h-64 md:h-80 bg-gradient-to-br from-secondary to-accent flex items-center justify-center relative overflow-hidden">
                 <img
                   src={leader.image}
                   alt={leader.name}
