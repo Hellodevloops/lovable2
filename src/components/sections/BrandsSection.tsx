@@ -3,24 +3,24 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect, useCallback } from "react";
 
 const brands = [
-  { name: "Tiffany & Co.", logo: "/assets/brands/tiffany-co-logo-.png" },
-  { name: "Christian Louboutin", logo: "/assets/brands/christian-louboutin-logo-png_seeklogo-320816-removebg-preview.png", logoClassName: "scale-[2.1]" },
-  { name: "Galeries Lafayette", logo: "/assets/brands/Galeries-Lafayette-logo-removebg-preview.png", logoClassName: "scale-[2.4]" },
-  { name: "Sabyasachi", logo: "/assets/brands/sabyasachi.com_logo27-removebg-preview.png", logoClassName: "scale-[2]" },
-  { name: "Rolex", logo: "/assets/brands/rolex.com logo11.png", logoClassName: "scale-110" },
-  { name: "Manish Malhotra", logo: "/assets/brands/Manish Malhotra1440x800-removebg-preview.png", logoClassName: "scale-125" },
-  { name: "Balenciaga", logo: "/assets/brands/Balenciaga-Logo.wine-removebg-preview.png", logoClassName: "scale-125" },
-  { name: "Le Mill", logo: "/assets/brands/lemill-removebg-preview.png", logoClassName: "scale-125" },
-  { name: "Abu Jani Sandeep Khosla", logo: "/assets/brands/AbuJaani Sandeep Khosla-NEW-LOGO-removebg-preview.png", logoClassName: "scale-110" },
-  { name: "Valentino", logo: "/assets/brands/Valentino-Logo-removebg-preview.png" },
-  { name: "Golden Goose", logo: "/assets/brands/goldengoose.png", logoClassName: "scale-[2.4]" },
-  { name: "Zegna", logo: "/assets/brands/Zegna-Logo.png", logoClassName: "scale-[1.8]" },
-  { name: "Good Earth", logo: "/assets/brands/goodearth-removebg-preview.png" },
-  { name: "Versace", logo: "/assets/brands/versace_rgb_black-removebg-preview.png", logoClassName: "scale-[1.8]" },
-  { name: "Jade by Monica & Karishma", logo: "/assets/brands/Jade by monica and karishma -removebg-preview.png", logoClassName: "scale-[1.7]" },
-  { name: "Giorgio Armani", logo: "/assets/brands/Giorgio-Armani-logo-768x432-removebg-preview.png", logoClassName: "scale-[1.7]" },
   { name: "Bombaim", logo: "/assets/brands/Bombaim-removebg-preview.png", logoClassName: "scale-[2]" },
   { name: "The Collective", logo: "/assets/brands/the_collective_640x360_4bb672e857-removebg-preview.png", logoClassName: "scale-[2.5]" },
+  { name: "Giorgio Armani", logo: "/assets/brands/Giorgio-Armani-logo-768x432-removebg-preview.png", logoClassName: "scale-[1.7]" },
+  { name: "Jade by Monica & Karishma", logo: "/assets/brands/Jade by monica and karishma -removebg-preview.png", logoClassName: "scale-[1.7]" },
+  { name: "Versace", logo: "/assets/brands/versace_rgb_black-removebg-preview.png", logoClassName: "scale-[2.8]" },
+  { name: "Good Earth", logo: "/assets/brands/goodearth-removebg-preview.png" },
+  { name: "Zegna", logo: "/assets/brands/Zegna-Logo.png", logoClassName: "scale-[1]" },
+  { name: "Golden Goose", logo: "/assets/brands/goldengoose.png", logoClassName: "scale-[3.2]" },
+  { name: "Valentino", logo: "/assets/brands/Valentino-Logo-removebg-preview.png" },
+  { name: "Abu Jani Sandeep Khosla", logo: "/assets/brands/AbuJaani Sandeep Khosla-NEW-LOGO-removebg-preview.png", logoClassName: "scale-110" },
+  { name: "Le Mill", logo: "/assets/brands/lemill-removebg-preview.png", logoClassName: "scale-125" },
+  { name: "Balenciaga", logo: "/assets/brands/Balenciaga-Logo.wine-removebg-preview.png", logoClassName: "scale-[2.9]" },
+  { name: "Manish Malhotra", logo: "/assets/brands/Manish Malhotra1440x800-removebg-preview.png", logoClassName: "scale-125" },
+  { name: "Rolex", logo: "/assets/brands/rolex.com logo11.png", logoClassName: "scale-110" },
+  { name: "Sabyasachi", logo: "/assets/brands/sabyasachi.com_logo27-removebg-preview.png", logoClassName: "scale-[1.2]" },
+  { name: "Galeries Lafayette", logo: "/assets/brands/Galeries-Lafayette-logo-removebg-preview.png", logoClassName: "scale-[2.4]" },
+  { name: "Christian Louboutin", logo: "/assets/brands/christian-louboutin-logo-png_seeklogo-320816-removebg-preview.png", logoClassName: "scale-[2.1]" },
+  { name: "Tiffany & Co.", logo: "/assets/brands/tiffany-co-logo-.png" },
 ];
 
 export const BrandsSection = () => {
@@ -35,7 +35,7 @@ export const BrandsSection = () => {
   const brandElementRef = useRef<HTMLDivElement | null>(null);
   const [brandWidth, setBrandWidth] = useState(0);
   const [manualOffset, setManualOffset] = useState(0);
-  const [animationPosition, setAnimationPosition] = useState(0);
+  const [animationPosition, setAnimationPosition] = useState(-280); // Start from the left to show last brand first
   const animationPositionRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartXRef = useRef(0);
@@ -48,17 +48,22 @@ export const BrandsSection = () => {
   const handleNext = useCallback(() => {
     setManualControl(true);
     setIsPaused(true);
-    let newPosition = currentPosition - 1;
-
-    // Infinite loop: if we're at the first brand, loop to the last brand
-    if (newPosition < -(brands.length - 1)) {
-      newPosition = 0;
-    }
-
-    const newOffset = newPosition * brandWidth;
     
-    // Batch state updates to prevent re-renders
-    setCurrentPosition(newPosition);
+    // Calculate current position from animation position
+    const currentAnimPos = animationPositionRef.current;
+    const baseWidth = 280;
+    const currentBrandIndex = Math.round(Math.abs(currentAnimPos) / baseWidth);
+    
+    // Move to next brand (with animation direction - towards right)
+    let newBrandIndex = currentBrandIndex - 1;
+    if (newBrandIndex < 0) {
+      newBrandIndex = brands.length - 1;
+    }
+    
+    // Calculate new offset
+    const newOffset = -(newBrandIndex * baseWidth);
+    
+    setCurrentPosition(newBrandIndex);
     setManualOffset(newOffset);
     setAnimationPosition(newOffset);
     
@@ -66,22 +71,27 @@ export const BrandsSection = () => {
       setManualControl(false);
       setIsPaused(false);
     }, 1000);
-  }, [currentPosition, brandWidth]);
+  }, []);
 
   const handlePrev = useCallback(() => {
     setManualControl(true);
     setIsPaused(true);
-    let newPosition = currentPosition + 1;
-
-    // Infinite loop: if we're at the last brand, loop to the first brand
-    if (newPosition > 0) {
-      newPosition = -(brands.length - 1);
-    }
-
-    const newOffset = newPosition * brandWidth;
     
-    // Batch state updates to prevent re-renders
-    setCurrentPosition(newPosition);
+    // Calculate current position from animation position
+    const currentAnimPos = animationPositionRef.current;
+    const baseWidth = 280;
+    const currentBrandIndex = Math.round(Math.abs(currentAnimPos) / baseWidth);
+    
+    // Move to previous brand (against animation direction - towards left)
+    let newBrandIndex = currentBrandIndex + 1;
+    if (newBrandIndex >= brands.length) {
+      newBrandIndex = 0;
+    }
+    
+    // Calculate new offset
+    const newOffset = -(newBrandIndex * baseWidth);
+    
+    setCurrentPosition(newBrandIndex);
     setManualOffset(newOffset);
     setAnimationPosition(newOffset);
     
@@ -89,7 +99,7 @@ export const BrandsSection = () => {
       setManualControl(false);
       setIsPaused(false);
     }, 1000);
-  }, [currentPosition, brandWidth]);
+  }, []);
 
   // Calculate brand width on mount with debouncing
   useEffect(() => {
@@ -113,7 +123,7 @@ export const BrandsSection = () => {
   // Optimized animation loop using requestAnimationFrame
   useEffect(() => {
     if (!manualControl && !isPaused && brandWidth > 0 && isInView) {
-      let currentPosition = manualOffset;
+      let currentPosition = animationPositionRef.current || -280; // Start from left offset
       
       const animate = (timestamp: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = timestamp;
@@ -124,11 +134,11 @@ export const BrandsSection = () => {
           const baseWidth = 280; // Fixed base width for consistent speed
           const totalWidth = baseWidth * brands.length * 2;
           const speed = (totalWidth / 100000) * deltaTime; // Consistent speed across devices
-          currentPosition -= speed;
+          currentPosition += speed;
 
           // Create infinite loop by wrapping around
-          if (currentPosition <= manualOffset - (baseWidth * brands.length)) {
-            currentPosition = manualOffset;
+          if (currentPosition >= 0) {
+            currentPosition = -(baseWidth * brands.length);
           }
 
           setAnimationPosition(currentPosition);
@@ -147,14 +157,14 @@ export const BrandsSection = () => {
         lastTimeRef.current = 0;
       };
     }
-  }, [manualControl, isPaused, brandWidth, isInView, manualOffset]);
+  }, [manualControl, isPaused, brandWidth, isInView]);
 
   // Ensure animation restarts properly after manual control
   useEffect(() => {
     if (!manualControl && !isPaused && brandWidth > 0) {
-      setAnimationPosition(manualOffset);
+      setAnimationPosition(animationPositionRef.current || -280);
     }
-  }, [manualControl, isPaused, manualOffset, brandWidth]);
+  }, [manualControl, isPaused, brandWidth]);
 
   const handleMouseEnter = useCallback(() => {
     if (manualControl) return;
