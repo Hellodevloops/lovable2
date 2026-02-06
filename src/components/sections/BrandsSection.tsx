@@ -35,11 +35,12 @@ export const BrandsSection = () => {
   const brandElementRef = useRef<HTMLDivElement | null>(null);
   const [brandWidth, setBrandWidth] = useState(0);
   const [manualOffset, setManualOffset] = useState(0);
-  const [animationPosition, setAnimationPosition] = useState(-280); // Start from the left to show last brand first
+  const [animationPosition, setAnimationPosition] = useState(0); // Start from 0 for left-scrolling
   const animationPositionRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartXRef = useRef(0);
   const dragStartOffsetRef = useRef(0);
+  const [isSnapping, setIsSnapping] = useState(false);
 
   useEffect(() => {
     animationPositionRef.current = animationPosition;
@@ -48,58 +49,85 @@ export const BrandsSection = () => {
   const handleNext = useCallback(() => {
     setManualControl(true);
     setIsPaused(true);
-    
+
     // Calculate current position from animation position
     const currentAnimPos = animationPositionRef.current;
-    const baseWidth = 280;
-    const currentBrandIndex = Math.round(Math.abs(currentAnimPos) / baseWidth);
-    
-    // Move to next brand (with animation direction - towards right)
-    let newBrandIndex = currentBrandIndex - 1;
-    if (newBrandIndex < 0) {
-      newBrandIndex = brands.length - 1;
-    }
-    
-    // Calculate new offset
-    const newOffset = -(newBrandIndex * baseWidth);
-    
+
+    // Use dynamic width or fallback to 280 to prevent division by zero
+    const itemWidth = brandWidth || 280;
+    const totalContentWidth = itemWidth * brands.length;
+
+    // Normalize position to positive index equivalent
+    let currentBrandIndex = Math.abs(currentAnimPos) / itemWidth;
+
+    // Move to next brand (scroll left)
+    const newBrandIndex = Math.floor(currentBrandIndex) + 1;
+    let newOffset = -(newBrandIndex * itemWidth); // Calculate offset based on dynamic width
+
+    setAnimationPosition(newOffset);
     setCurrentPosition(newBrandIndex);
     setManualOffset(newOffset);
-    setAnimationPosition(newOffset);
-    
+
     setTimeout(() => {
       setManualControl(false);
       setIsPaused(false);
     }, 1000);
-  }, []);
+  }, [brandWidth]); // Dependency on brandWidth added
 
   const handlePrev = useCallback(() => {
     setManualControl(true);
     setIsPaused(true);
-    
-    // Calculate current position from animation position
+
     const currentAnimPos = animationPositionRef.current;
-    const baseWidth = 280;
-    const currentBrandIndex = Math.round(Math.abs(currentAnimPos) / baseWidth);
-    
-    // Move to previous brand (against animation direction - towards left)
-    let newBrandIndex = currentBrandIndex + 1;
-    if (newBrandIndex >= brands.length) {
-      newBrandIndex = 0;
+    const itemWidth = brandWidth || 280;
+    const totalContentWidth = itemWidth * brands.length;
+
+    // Determine current index based on nearest item
+    // Use Math.round to decide which item we are currently "on"
+    let currentBrandIndex = Math.round(Math.abs(currentAnimPos) / itemWidth);
+    let newBrandIndex = currentBrandIndex - 1;
+
+    // Check if we need to wrap around (going past the first item)
+    if (newBrandIndex < 0) {
+      setIsSnapping(true);
+
+      // Calculate the exact offset within the current item to preserve during snap
+      // currentAnimPos is negative. e.g. -5. 
+      // snappedPos should be start of second set + offset.
+      // start of second set is -totalContentWidth.
+      // We essentially shift by -totalContentWidth.
+      const snapShift = -totalContentWidth;
+      const snappedPos = currentAnimPos + snapShift;
+
+      // Snap immediately
+      animationPositionRef.current = snappedPos;
+      setAnimationPosition(snappedPos);
+      setManualOffset(snappedPos);
+
+      // Calculate target for the animation (Previous item in the second set)
+      // We want to land on the last item: index = brands.length - 1
+      const targetPos = -((brands.length - 1) * itemWidth);
+
+      // Use setTimeout to ensure the snap frame processes before animating
+      setTimeout(() => {
+        setIsSnapping(false);
+        setAnimationPosition(targetPos);
+        setManualOffset(targetPos);
+      }, 50);
+    } else {
+      setIsSnapping(false);
+      // Normal previous: move to new index
+      const newOffset = -(newBrandIndex * itemWidth);
+
+      setAnimationPosition(newOffset);
+      setManualOffset(newOffset);
     }
-    
-    // Calculate new offset
-    const newOffset = -(newBrandIndex * baseWidth);
-    
-    setCurrentPosition(newBrandIndex);
-    setManualOffset(newOffset);
-    setAnimationPosition(newOffset);
-    
+
     setTimeout(() => {
       setManualControl(false);
       setIsPaused(false);
     }, 1000);
-  }, []);
+  }, [brandWidth]);
 
   // Calculate brand width on mount with debouncing
   useEffect(() => {
@@ -115,7 +143,7 @@ export const BrandsSection = () => {
 
     // Initial calculation
     calculateBrandWidth();
-    
+
     window.addEventListener('resize', debouncedCalculate, { passive: true });
     return () => window.removeEventListener('resize', debouncedCalculate);
   }, []);
@@ -123,38 +151,39 @@ export const BrandsSection = () => {
   // Optimized animation loop using requestAnimationFrame
   useEffect(() => {
     if (!manualControl && !isPaused && brandWidth > 0 && isInView) {
-      let currentPosition = animationPositionRef.current || -280; // Start from left offset
-      
+      let currentPosition = animationPositionRef.current || 0;
+      const itemWidth = brandWidth;
+      const totalWidth = itemWidth * brands.length * 2;
+      const speedFactor = totalWidth / 85000; // Pre-calculate for performance
+
       const animate = (timestamp: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = timestamp;
-        
+
         const deltaTime = timestamp - lastTimeRef.current;
-        
+
         if (deltaTime >= 16) { // Cap at ~60fps
-          const baseWidth = 280; // Fixed base width for consistent speed
-          const totalWidth = baseWidth * brands.length * 2;
-          const speed = (totalWidth / 100000) * deltaTime; // Consistent speed across devices
-          currentPosition += speed;
+          currentPosition -= speedFactor * deltaTime;
 
           // Create infinite loop by wrapping around
-          if (currentPosition >= 0) {
-            currentPosition = -(baseWidth * brands.length);
+          if (currentPosition <= -(itemWidth * brands.length)) {
+            currentPosition = 0;
           }
 
           setAnimationPosition(currentPosition);
           lastTimeRef.current = timestamp;
         }
-        
+
         animationFrameRef.current = requestAnimationFrame(animate);
       };
-      
+
       animationFrameRef.current = requestAnimationFrame(animate);
 
       return () => {
+        lastTimeRef.current = 0;
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = undefined;
         }
-        lastTimeRef.current = 0;
       };
     }
   }, [manualControl, isPaused, brandWidth, isInView]);
@@ -162,7 +191,7 @@ export const BrandsSection = () => {
   // Ensure animation restarts properly after manual control
   useEffect(() => {
     if (!manualControl && !isPaused && brandWidth > 0) {
-      setAnimationPosition(animationPositionRef.current || -280);
+      setAnimationPosition(animationPositionRef.current || 0);
     }
   }, [manualControl, isPaused, brandWidth]);
 
@@ -241,12 +270,12 @@ export const BrandsSection = () => {
       {/* Infinite Scrolling Marquee */}
       <div
         className={`relative select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         style={{ touchAction: "pan-y" }}
       >
         {/* Gradient Fade Left */}
@@ -256,7 +285,7 @@ export const BrandsSection = () => {
 
         {/* Navigation Buttons */}
         <button
-          onClick={handlePrev}
+          onClick={handleNext}
           className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-foreground rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 opacity-80 hover:opacity-100"
           aria-label="Previous brands"
         >
@@ -266,7 +295,7 @@ export const BrandsSection = () => {
         </button>
 
         <button
-          onClick={handleNext}
+          onClick={handlePrev}
           className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-foreground rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 opacity-80 hover:opacity-100"
           aria-label="Next brands"
         >
@@ -285,11 +314,16 @@ export const BrandsSection = () => {
           transition={{
             duration: 0.8,
             delay: 0.3,
-            x: isDragging
+            x: isDragging || isSnapping
               ? { type: "tween", duration: 0 }
               : manualControl
-                ? { type: "spring", stiffness: 300, damping: 30 }
+                ? { type: "spring", stiffness: 300, damping: 30, mass: 1 }
                 : { type: "tween", ease: "linear", duration: 0.016 }
+          }}
+          // Ensure we don't flash when snapping
+          style={{
+            transform: `translateX(${manualControl ? manualOffset : animationPosition}px)`,
+            willChange: "transform"
           }}
           className="flex"
         >
@@ -305,6 +339,11 @@ export const BrandsSection = () => {
                   src={brand.logo}
                   alt={brand.name}
                   className={`h-12 w-auto max-w-[180px] object-contain md:h-14 lg:h-16 ${brand.logoClassName ?? ""}`}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                  loading="lazy"
                 />
               </div>
             ))}
@@ -320,6 +359,11 @@ export const BrandsSection = () => {
                   src={brand.logo}
                   alt={brand.name}
                   className={`h-12 w-auto max-w-[180px] object-contain md:h-14 lg:h-16 ${brand.logoClassName ?? ""}`}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                  loading="lazy"
                 />
               </div>
             ))}
