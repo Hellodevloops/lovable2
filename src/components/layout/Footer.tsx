@@ -16,30 +16,61 @@ export const Footer = () => {
 
           {/* Links */}
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <a href="#about" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <a
+              href="https://luxehire.co/#about"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               About
             </a>
-            <a href="#for-clients" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <a
+              href="https://luxehire.co/#for-clients"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               For Brands
             </a>
-            <a href="#for-candidates" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <a
+              href="https://luxehire.co/#for-candidates"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               For Talent
             </a>
-            <a href="#contact" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <a
+              href="https://luxehire.co/#contact"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               Contact
             </a>
-            <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <Link
+              to="/who-we-are"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
+              Who We Are
+            </Link>
+            <Link
+              to="/privacy-policy"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               Privacy Policy
             </Link>
-            <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <Link
+              to="/data-protection"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
+              Data Protection
+            </Link>
+            <Link
+              to="/cookie-policy"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               Cookie Policy
             </Link>
-            <Link to="/terms" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+            <Link
+              to="/terms"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
+            >
               Terms of Service
             </Link>
-            <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-              Cookie Settings
-            </Link>
+          
           </nav>
 
           {/* Social */}
@@ -69,7 +100,12 @@ export const Footer = () => {
           </p>
           <p className="text-xs text-muted-foreground">
             Operated by Devloops Technologies Pvt. Ltd. · Privacy:{" "}
-            <a href="mailto:privacy@luxehire.co" className="text-primary hover:underline">privacy@luxehire.co</a>
+            <a
+              href="mailto:privacy@luxehire.in"
+              className="text-primary hover:underline"
+            >
+              privacy@luxehire.in
+            </a>
           </p>
         </div>
       </div>

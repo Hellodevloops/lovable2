@@ -28,50 +28,160 @@ const CookiePolicy = () => {
       </header>
 
       <main className="container mx-auto px-6 lg:px-12 py-12 lg:py-16 max-w-3xl">
-        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-2">Cookie Policy</h1>
-        <p className="text-sm text-muted-foreground mb-10">Last updated: March 2025</p>
+        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-2">
+          Cookie Policy
+        </h1>
+        <p className="text-sm text-muted-foreground mb-2">
+          LuxeHire.co — Operated by Devloops Technologies Pvt. Ltd.
+        </p>
+        <p className="text-sm text-muted-foreground mb-1">
+          <span className="font-semibold text-foreground">Effective Date:</span>{" "}
+          February 1, 2026
+        </p>
+        <p className="text-sm text-muted-foreground mb-8">
+          This Cookie Policy explains how LuxeHire uses cookies in compliance
+          with the EU ePrivacy Directive 2002/58/EC, GDPR, India&apos;s IT Rules
+          2011, DPDPA 2023, and DPDP Rules 2025.
+        </p>
 
         <div className="prose prose-sm max-w-none space-y-8 text-muted-foreground">
           <section>
-            <h2 className="text-lg font-medium text-foreground mb-2">1. What Are Cookies?</h2>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              1. What Are Cookies
+            </h2>
             <p>
-              Cookies are small text files that are placed on your device when you visit a website. They are widely used to make websites work more efficiently, to remember your preferences, and to understand how visitors use the site.
+              Cookies are small text files placed on your device when you visit a
+              website. They help the website function correctly, remember your
+              preferences, and allow us to understand how visitors use the site
+              so we can continue improving it.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-medium text-foreground mb-2">2. Types of Cookies We Use</h2>
-            <ul className="list-disc pl-6 space-y-2">
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              2. How We Use Cookies
+            </h2>
+            <p>
+              We use three categories of cookies on LuxeHire.co. Non-essential
+              cookies are only activated after you give your explicit consent
+              through the banner shown on your first visit to the site.
+            </p>
+
+            <h3 className="text-base font-semibold text-foreground mt-4 mb-1">
+              Essential Cookies
+            </h3>
+            <p>
+              These cookies are required for the website to function. They
+              cannot be disabled without affecting core site functionality and
+              do not require your consent.
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
               <li>
-                <strong className="text-foreground">Essential cookies</strong> – Required for the website to function (e.g. security, load balancing). These cannot be disabled.
+                <span className="font-semibold text-foreground">
+                  Session token
+                </span>{" "}
+                – maintains your active session securely (session only).
               </li>
               <li>
-                <strong className="text-foreground">Analytics cookies</strong> – Help us understand how visitors use our site (e.g. pages viewed, time on site). These are optional and can be rejected via our cookie banner.
+                <span className="font-semibold text-foreground">
+                  CSRF token
+                </span>{" "}
+                – protects your data against cross-site attacks (session only).
+              </li>
+            </ul>
+
+            <h3 className="text-base font-semibold text-foreground mt-4 mb-1">
+              Analytics Cookies
+            </h3>
+            <p>
+              These cookies help us understand how visitors arrive at and use
+              our website. Data collected is pseudonymised and does not directly
+              identify you. Your consent is required before they are set.
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
+              <li>
+                <code>_ga</code> – distinguishes unique visitors (up to 26
+                months)
               </li>
               <li>
-                <strong className="text-foreground">Preference cookies</strong> – Remember your choices (e.g. cookie consent, language). These improve your experience.
+                <code>_gid</code> – identifies users between sessions (24 hours)
+              </li>
+              <li>
+                <code>_gat</code> – controls the rate of data requests (1
+                minute)
+              </li>
+            </ul>
+            <p className="mt-2">
+              Provider: Google Analytics. These cookies are only set if you
+              consent via our cookie banner.
+            </p>
+
+            <h3 className="text-base font-semibold text-foreground mt-4 mb-1">
+              Functional Cookies
+            </h3>
+            <p>
+              These cookies remember your preferences to improve your experience
+              on return visits. Your consent is required before they are set.
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
+              <li>
+                <span className="font-semibold text-foreground">
+                  Preference cookie
+                </span>{" "}
+                – stores language or display preferences (up to 12 months).
               </li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-lg font-medium text-foreground mb-2">3. Cookie Consent Banner</h2>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              3. Your Cookie Choices
+            </h2>
             <p>
-              On your first visit to our website, a cookie consent banner is displayed. You can choose to <strong className="text-foreground">Accept Cookies</strong> (all cookies) or <strong className="text-foreground">Reject Non-Essential Cookies</strong>. Your choice is stored so we do not ask again until you clear it or change your preferences.
+              When you first visit LuxeHire, a banner will offer you three
+              options: <span className="font-semibold text-foreground">
+                Accept All
+              </span>
+              ,{" "}
+              <span className="font-semibold text-foreground">
+                Reject Non-Essential
+              </span>
+              , or{" "}
+              <span className="font-semibold text-foreground">
+                Customise by category
+              </span>
+              . You may update your preferences at any time using the{" "}
+              <span className="font-semibold text-foreground">
+                Cookie Settings
+              </span>{" "}
+              link in the footer of every page.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-medium text-foreground mb-2">4. Managing Cookies via Your Browser</h2>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              4. Managing Cookies via Your Browser
+            </h2>
             <p>
-              You can also manage or delete cookies through your browser settings. Most browsers allow you to refuse or accept cookies, or to delete existing cookies. The steps vary by browser; typically you can find options under Settings → Privacy / Security → Cookies. Note that blocking all cookies may affect how our website works.
+              You may also manage or block cookies through your own browser
+              settings. Most browsers allow you to refuse or accept cookies, or
+              to delete existing cookies. The steps vary by browser; typically
+              you can find options under Settings → Privacy / Security →
+              Cookies. Disabling certain cookies may affect how some parts of
+              the site function.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-medium text-foreground mb-2">5. Change Your Cookie Preferences</h2>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              5. Change Your Cookie Preferences
+            </h2>
             <p>
-              You can withdraw or change your cookie consent at any time. Use the &quot;Cookie Settings&quot; link in our website footer, or click the button below to clear your saved preference. The cookie banner will appear again on your next visit so you can make a new choice.
+              You can withdraw or change your cookie consent at any time. Use
+              the &quot;Cookie Settings&quot; link in our website footer, or
+              click the button below to clear your saved preference. The cookie
+              banner will appear again on your next visit so you can make a new
+              choice.
             </p>
             <Button
               variant="outline"
@@ -84,9 +194,55 @@ const CookiePolicy = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-medium text-foreground mb-2">6. Contact</h2>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              6. Google Analytics Opt-Out
+            </h2>
             <p>
-              For questions about our use of cookies: <a href="mailto:privacy@luxehire.co" className="text-primary hover:underline">privacy@luxehire.co</a>.
+              To prevent Google Analytics from collecting data about your visits
+              across all websites, you can install the Google Analytics opt-out
+              browser add-on available at{" "}
+              <a
+                href="https://tools.google.com/dlpage/gaoptout"
+                className="text-primary hover:underline"
+              >
+                tools.google.com/dlpage/gaoptout
+              </a>
+              .
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              7. Updates to This Policy
+            </h2>
+            <p>
+              We may update this Cookie Policy from time to time. The effective
+              date at the top of this page will reflect when changes were last
+              made. Continued use of LuxeHire after an update constitutes your
+              acceptance of the changes.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              8. Contact
+            </h2>
+            <p>
+              For any questions about how we use cookies:
+            </p>
+            <p className="mt-2">
+              Email:{" "}
+              <a
+                href="mailto:privacy@luxehire.in"
+                className="text-primary hover:underline"
+              >
+                privacy@luxehire.in
+              </a>
+              <br />
+              Phone: +91 6351214414
+              <br />
+              Devloops Technologies Pvt. Ltd., 410, Nilamber Primero, Bhayli
+              Vasna Road, Vadodara, Gujarat 391410, India
             </p>
           </section>
         </div>
