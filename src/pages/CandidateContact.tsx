@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, CheckCircle, Upload, FileText, Menu, X, Linkedin, Instagram } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const CandidateContact = () => {
   const ref = useRef(null);
@@ -12,6 +13,7 @@ const CandidateContact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,6 +39,10 @@ const CandidateContact = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!consentGiven) {
+      toast.error("Please agree to the processing and sharing of your profile with client companies.");
+      return;
+    }
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);
@@ -281,6 +287,17 @@ const CandidateContact = () => {
                       )}
                     </label>
                   </div>
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <Checkbox
+                      checked={consentGiven}
+                      onCheckedChange={(checked) => setConsentGiven(checked === true)}
+                      className="mt-0.5"
+                    />
+                    <span className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                      I agree to LuxeHire processing and sharing my profile with relevant client companies for recruitment purposes. I have read the{" "}
+                      <Link to="/privacy-policy" className="text-primary underline hover:no-underline">Privacy Policy</Link>.
+                    </span>
+                  </label>
                   <button
                     type="submit"
                     disabled={isSubmitting || isSubmitted}
@@ -320,7 +337,7 @@ const CandidateContact = () => {
             </Link>
 
             {/* Links */}
-            <nav className="flex items-center gap-6">
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               <Link to="/#about" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
                 About
               </Link>
@@ -332,6 +349,18 @@ const CandidateContact = () => {
               </Link>
               <Link to="/#contact" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
                 Contact
+              </Link>
+              <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+                Privacy Policy
+              </Link>
+              <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+                Cookie Policy
+              </Link>
+              <Link to="/terms" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+                Terms of Service
+              </Link>
+              <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+                Cookie Settings
               </Link>
             </nav>
 
@@ -365,9 +394,13 @@ const CandidateContact = () => {
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-border/50 text-center">
+          <div className="mt-8 pt-6 border-t border-border/50 text-center space-y-1">
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} LuxeHire. All rights reserved.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Operated by Devloops Technologies Pvt. Ltd. · Privacy:{" "}
+              <a href="mailto:privacy@luxehire.co" className="text-primary hover:underline">privacy@luxehire.co</a>
             </p>
           </div>
         </div>
