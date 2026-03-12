@@ -22,7 +22,19 @@ const clientDistPath = path.join(__dirname, "..", "dist");
 
 initDb();
 
-app.use(helmet());
+const cspDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
+cspDirectives["img-src"] = [
+  ...(cspDirectives["img-src"] || []),
+  "https://purecatamphetamine.github.io",
+];
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: cspDirectives,
+    },
+  })
+);
 app.use(
   cors({
     origin: true, // reflect request origin
