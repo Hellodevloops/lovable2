@@ -4,6 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { db, initDb } from "./db.js";
 import { authMiddleware, generateToken, sanitizeObject } from "./auth.js";
 import bcrypt from "bcryptjs";
@@ -13,6 +15,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientDistPath = path.join(__dirname, "..", "dist");
 
 initDb();
 
@@ -272,6 +278,12 @@ app.delete("/api/contacts/:id", authMiddleware, (req, res) => {
       return res.json({ message: "Contact deleted" });
     }
   );
+});
+
+// Serve built frontend (Vite) from /dist when running in production
+app.use(express.static(clientDistPath));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
 app.listen(PORT, () => {
