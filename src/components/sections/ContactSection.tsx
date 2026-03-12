@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, CheckCircle, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const ContactSection = () => {
   const ref = useRef(null);
@@ -10,6 +12,7 @@ export const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [consentGiven, setConsentGiven] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,6 +38,10 @@ export const ContactSection = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!consentGiven) {
+      toast.error("Please agree to the processing and sharing of your data.");
+      return;
+    }
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);
@@ -152,6 +159,17 @@ export const ContactSection = () => {
                 placeholder="How can we help?"
                 className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors resize-none"
               />
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <Checkbox
+                  checked={consentGiven}
+                  onCheckedChange={(checked) => setConsentGiven(checked === true)}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-muted-foreground group-hover:text-foreground/80">
+                  I agree to LuxeHire processing and sharing my profile with relevant client companies for recruitment purposes. I have read the{" "}
+                  <Link to="/privacy-policy" className="text-primary underline hover:no-underline">Privacy Policy</Link>.
+                </span>
+              </label>
               {/* <div className="relative">
                 <input
                   type="file"

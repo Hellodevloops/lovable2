@@ -1,5 +1,5 @@
-import { Linkedin, Instagram, Mail } from "lucide-react";
-import logo from "@/assets/luxehire-logo.png";
+import { Link } from "react-router-dom";
+import { Linkedin, Mail } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -7,15 +7,15 @@ export const Footer = () => {
       <div className="container mx-auto px-6 lg:px-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Text Logo */}
-          <a href="#home" className="flex items-center">
+          <Link to="/" className="flex items-center">
             <span className="font-serif text-2xl">
               <span className="text-primary italic">Luxe</span>
               <span className="text-foreground">Hire</span>
             </span>
-          </a>
+          </Link>
 
           {/* Links */}
-          <nav className="flex items-center gap-6">
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <a href="#about" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
               About
             </a>
@@ -28,6 +28,18 @@ export const Footer = () => {
             <a href="#contact" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
               Contact
             </a>
+            <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+              Privacy Policy
+            </Link>
+            <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+              Cookie Policy
+            </Link>
+            <Link to="/terms" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+              Terms of Service
+            </Link>
+            <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
+              Cookie Settings
+            </Link>
           </nav>
 
           {/* Social */}
@@ -41,15 +53,6 @@ export const Footer = () => {
             >
               <Linkedin size={14} />
             </a>
-            {/* <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram size={14} />
-            </a> */}
             <a
               href="mailto:hello@luxehire.co"
               className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
@@ -60,9 +63,13 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border/50 text-center">
+        <div className="mt-8 pt-6 border-t border-border/50 text-center space-y-1">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} LuxeHire. All rights reserved.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Operated by Devloops Technologies Pvt. Ltd. · Privacy:{" "}
+            <a href="mailto:privacy@luxehire.co" className="text-primary hover:underline">privacy@luxehire.co</a>
           </p>
         </div>
       </div>
