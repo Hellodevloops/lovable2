@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, CheckCircle, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { apiClient } from "@/lib/apiClient";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 export const ContactSection = () => {
   const ref = useRef(null);
@@ -13,6 +16,7 @@ export const ContactSection = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [consentGiven, setConsentGiven] = useState(false);
+  const [phoneValue, setPhoneValue] = useState<string | undefined>();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,22 +40,95 @@ export const ContactSection = () => {
     }
   };
 
+  const detectDeviceType = () => {
+    if (typeof window === "undefined") return "desktop";
+    const ua = window.navigator.userAgent.toLowerCase();
+    if (/tablet|ipad|playbook|silk/.test(ua)) return "tablet";
+    if (/mobile|iphone|ipod|android|blackberry|phone/.test(ua)) return "mobile";
+    return "desktop";
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!consentGiven) {
       toast.error("Please agree to the processing and sharing of your data.");
       return;
     }
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success("Thank you. We'll be in touch shortly.");
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setResumeFile(null);
-      (e.target as HTMLFormElement).reset();
-    }, 3000);
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const name = (formData.get("name") || "").toString().trim();
+    const email = (formData.get("email") || "").toString().trim();
+    const subject = (formData.get("subject") || "").toString().trim();
+    const message = (formData.get("message") || "").toString().trim();
+
+    if (!name || !email || !message) {
+      toast.error("Please fill in your name, email and message.");
+      return;
+    }
+
+    if (phoneValue && !isValidPhoneNumber(phoneValue)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+
+    const screenResolution =
+      typeof window !== "undefined"
+        ? `${window.screen.width}x${window.screen.height}`
+        : "";
+    const language =
+      typeof navigator !== "undefined" ? navigator.language || "" : "";
+    const timezone =
+      typeof Intl !== "undefined"
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+        : "";
+    const referrer =
+      typeof document !== "undefined" ? document.referrer || "" : "";
+    // Network type (if available) - not stored but useful for future
+    const networkType =
+      typeof navigator !== "undefined" &&
+      (navigator as any).connection &&
+      (navigator as any).connection.effectiveType
+        ? (navigator as any).connection.effectiveType
+        : undefined;
+
+    const deviceType = detectDeviceType();
+
+    const payload: Record<string, unknown> = {
+      name,
+      email,
+      phone: phoneValue || "",
+      subject,
+      message,
+      screenResolution,
+      language,
+      timezone,
+      referrer,
+      deviceType,
+      networkType,
+      userAgent:
+        typeof navigator !== "undefined" ? navigator.userAgent || "" : "",
+    };
+
+    try {
+      setIsSubmitting(true);
+      await apiClient.post("/contact", payload);
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      toast.success("Thank you. We'll be in touch shortly.");
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setResumeFile(null);
+        form.reset();
+      }, 3000);
+    } catch (error: any) {
+      setIsSubmitting(false);
+      const message =
+        error?.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -90,8 +167,8 @@ export const ContactSection = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Email</p>
-                  <a href="mailto:hello@luxehire.co" className="text-sm font-medium hover:text-primary transition-colors">
-                    hello@luxehire.co
+                  <a href="mailto:hello@luxehire.in" className="text-sm font-medium hover:text-primary transition-colors">
+                    hello@luxehire.in
                   </a>
                 </div>
               </div>
@@ -101,7 +178,7 @@ export const ContactSection = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Phone</p>
-                  <a href="tel:+916355523072" className="text-sm font-medium hover:text-primary transition-colors">
+                  <a href="tel:+916355 523 076" className="text-sm font-medium hover:text-primary transition-colors">
                     +91 6355 523 076
                   </a>
                 </div>
@@ -112,8 +189,8 @@ export const ContactSection = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">LuxeHire</p>
-                  <a href="tel:+916355523072" className="text-sm font-medium hover:text-primary transition-colors">
-                    +91 6358217266
+                  <a href="tel:+916351214414" className="text-sm font-medium hover:text-primary transition-colors">
+                    +91 6351 214 414
                   </a>
                 </div>
               </div>
@@ -146,12 +223,28 @@ export const ContactSection = () => {
                   className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
                 />
               </div>
-              <input
-                type="text"
-                name="company"
-                placeholder="Company / Brand (Optional)"
-                className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
-              />
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-muted-foreground">Phone (optional)</span>
+                  <PhoneInput
+                    international
+                    defaultCountry="IN"
+                    value={phoneValue}
+                    onChange={setPhoneValue}
+                    className="w-full bg-card border border-border rounded-sm px-2 py-1 text-sm text-foreground focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/40 focus-within:outline-none transition-colors"
+                    inputClassName="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1"
+                  />
+                  <span className="text-[10px] text-muted-foreground">
+                    Includes country code, e.g. +91 98765 43210
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Subject (Optional)"
+                  className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
+                />
+              </div>
               <textarea
                 name="message"
                 required
@@ -166,7 +259,8 @@ export const ContactSection = () => {
                   className="mt-0.5"
                 />
                 <span className="text-xs text-muted-foreground group-hover:text-foreground/80">
-                  I agree to LuxeHire processing and sharing my profile with relevant client companies for recruitment purposes. I have read the{" "}
+                I consent to LuxeHire, operated by Devloops Technologies Pvt. Ltd., processing my personal data to 
+                respond to my enquiry, in accordance with the LuxeHire Privacy Policy. {" "}
                   <Link to="/privacy-policy" className="text-primary underline hover:no-underline">Privacy Policy</Link>.
                 </span>
               </label>
