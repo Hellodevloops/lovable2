@@ -1,14 +1,19 @@
 ## Single Dockerfile for frontend + backend (Node + Express + Vite)
 
-FROM node:20-alpine AS base
+FROM node:20-bullseye-slim AS base
 
 WORKDIR /app
+
+## System deps for sqlite3 native module
+RUN apt-get update && \
+    apt-get install -y python3 make g++ && \
+    rm -rf /var/lib/apt/lists/*
 
 ## Install frontend dependencies
 COPY package.json package-lock.json* ./
 RUN npm install
 
-## Install backend dependencies
+## Install backend dependencies (build sqlite3 against container OS)
 COPY server/package.json server/package-lock.json* ./server/
 RUN cd server && npm install --omit=dev
 
@@ -27,5 +32,6 @@ WORKDIR /app/server
 EXPOSE 4000
 
 CMD ["npm", "start"]
+
 
 
