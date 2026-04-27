@@ -11,11 +11,11 @@ RUN apt-get update && \
 
 ## Install frontend dependencies
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm ci --include=dev
 
 ## Install backend dependencies (build sqlite3 against container OS)
 COPY server/package.json server/package-lock.json* ./server/
-RUN cd server && npm install --omit=dev
+RUN cd server && npm ci --omit=dev
 
 ## Copy full source
 COPY . .
