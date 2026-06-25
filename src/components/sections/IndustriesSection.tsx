@@ -58,7 +58,7 @@ export const IndustriesSection = () => {
               each demands. Whether it's creative vision in fashion or precision 
               in watchmaking, we find leaders who fit perfectly.
             </p>
-            <a href="#contact" className="btn-luxury inline-block text-xs">
+            <a href="/contact" className="btn-luxury inline-block text-xs">
               Discuss Your Needs
             </a>
           </motion.div>

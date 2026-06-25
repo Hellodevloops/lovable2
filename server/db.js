@@ -45,6 +45,19 @@ export function initDb() {
       )
     `);
 
+    db.run(`
+  CREATE TABLE IF NOT EXISTS candidates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT,
+    phone TEXT,
+    current_role TEXT,
+    message TEXT,
+    resume TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
     // Seed a default admin user if none exists
     const defaultEmail = "admin@luxehire.in";
     const defaultPassword = "EGd80(d3)3A*9#BE$}_"; // NOTE: change in production

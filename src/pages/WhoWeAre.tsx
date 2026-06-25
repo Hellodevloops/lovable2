@@ -143,8 +143,6 @@ const WhoWeAre = () => {
           </Link>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

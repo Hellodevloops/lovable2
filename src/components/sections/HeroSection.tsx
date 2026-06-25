@@ -57,14 +57,14 @@ export const HeroSection = () => {
             className="flex flex-col sm:flex-row items-start gap-4 "
           >
             <a 
-              href="#contact" 
+              href="/contact" 
               className="inline-flex items-center gap-3 px-8 py-4 bg-[#1a2332] text-white font-medium text-sm tracking-wider uppercase hover:bg-[#2a3342] transition-colors duration-300"
             >
               Hire With Us
               <ArrowRight size={18} />
             </a>
             <a 
-              href="#for-candidates" 
+              href="/for-candidates" 
               className="inline-flex items-center gap-3 px-8 py-4 border-2 border-foreground/20 text-foreground font-medium text-sm tracking-wider uppercase hover:border-foreground/40 hover:bg-foreground/5 transition-all duration-300"
             >
               Explore Opportunities

@@ -5,62 +5,188 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, CheckCircle, Upload, FileText, Menu, X, Linkedin, Instagram } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/lib/apiClient";
 
 const CandidateContact = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file size (10MB limit)
-      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-      if (file.size > maxSize) {
-        toast.error("File size must be less than 10MB");
-        e.target.value = '';
-        return;
-      }
-      
-      // Validate file type (PDF, DOC, DOCX)
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (allowedTypes.includes(file.type)) {
-        setResumeFile(file);
-      } else {
-        toast.error("Please upload a PDF or Word document");
-        e.target.value = '';
-      }
-    }
-  };
+  // ✅ MOVE HERE
+  const [formDataState, setFormDataState] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    current_role: "",
+    message: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!consentGiven) {
-      toast.error("Please agree to the processing and sharing of your profile with client companies.");
+  const queryClient = useQueryClient();
+
+  // ✅ HANDLE INPUT CHANGE (TEXT FIELDS)
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  setFormDataState({
+    ...formDataState,
+    [e.target.name]: e.target.value,
+  });
+};
+
+// ✅ HANDLE FILE UPLOAD
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+
+  if (file) {
+    // Validate file size (10MB limit)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("File size must be less than 10MB");
+      e.target.value = "";
       return;
     }
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success("Thank you. We'll be in touch shortly.");
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setResumeFile(null);
-      (e.target as HTMLFormElement).reset();
-    }, 3000);
-  };
 
+    // Validate file type
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Only PDF, DOC, DOCX files allowed");
+      e.target.value = "";
+      return;
+    }
+
+    // ✅ SAVE FILE
+    setResumeFile(file);
+  }
+};
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  if (!consentGiven) {
+    toast.error("Please accept consent");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+
+    formData.append("name", formDataState.name);
+    formData.append("email", formDataState.email);
+    formData.append("phone", formDataState.phone);
+    formData.append("current_role", formDataState.current_role);
+    formData.append("message", formDataState.message);
+
+    if (resumeFile) {
+      formData.append("resume", resumeFile);
+    }
+
+    console.log("Resume file:", resumeFile);
+    // ✅ IMPORTANT (closing bracket + semicolon)
+await apiClient.post("/candidate", formData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+});
+
+    queryClient.invalidateQueries({ queryKey: ["candidates"] });
+    toast.success("Application submitted successfully!");
+
+    // ✅ IMPORTANT (semicolon)
+    queryClient.invalidateQueries({ queryKey: ["candidates"] });
+
+
+    // ✅ RESET FORM
+    setFormDataState({
+      name: "",
+      email: "",
+      phone: "",
+      current_role: "",
+      message: "",
+    });
+
+    setResumeFile(null);
+
+  } 
+  catch (error: any) {
+  console.error("FULL ERROR:", error);
+
+  // ✅ SHOW BACKEND ERROR
+  const msg =
+    error?.response?.data?.error ||
+    error?.response?.data?.message ||
+    error.message;
+
+  toast.error(msg);
+}
+  // catch (error) {
+  //   console.error(error);
+  //   toast.error("Submission failed");
+  // } finally {
+  //   setIsSubmitting(false);
+  // }
+};
+//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+//     if (!consentGiven) {
+//       toast.error("Please agree to the processing and sharing of your profile with client companies.");
+//       return;
+//     }
+//     setIsSubmitting(true);
+//     await new Promise((resolve) => setTimeout(resolve, 1500));
+//     setIsSubmitting(false);
+//     setIsSubmitted(true);
+//     toast.success("Thank you. We'll be in touch shortly.");
+//     setTimeout(() => {
+//       setIsSubmitted(false);
+//       setResumeFile(null);
+//       (e.target as HTMLFormElement).reset();
+//     }, 3000);
+    
+//     await apiClient.post("/candidate", FormData, {
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+
+//     queryClient.invalidateQueries({ queryKey: ["candidates"] });
+
+//     toast.success("Application submitted successfully!");
+
+//     setIsSubmitted(true);
+
+//     // reset form
+//     setFormDataState({
+//       name: "",
+//       email: "",
+//       phone: "",
+//       currentRole: "",
+//       message: "",
+//     });
+//     setResumeFile(null);
+
+//   } catch (error) {
+//     console.error(error);
+//     toast.error("Submission failed");
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
+
+    
   const navLinks = [
     { label: "Home", href: "/" },
-    { label: "For Brands", href: "/#for-clients" },
-    { label: "For Candidates", href: "/#for-candidates" },
-    { label: "Who We Are", href: "/#about" },
-    { label: "Contact", href: "/#contact" },
+    { label: "For Brands", href: "/for-clients" },
+    { label: "For Candidates", href: "/for-candidates" },
+    { label: "Who We Are", href: "/about" },
+    { label: "Contact", href: "/contact" },
   ];
 
   return (
@@ -215,15 +341,32 @@ const CandidateContact = () => {
                       </a>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-sm bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Global Presence</p>
-                      <p className="text-sm font-medium">India · Middle East · Europe</p>
-                    </div>
-                  </div>
+                   <div className="flex gap-3 items-start relative group">
+  <MapPin className="text-primary mt-1" />
+
+  <div className="relative">
+    <a
+      href="https://www.google.com/maps?q=410,+Nilamber+Primero,+Bhayli+Vasna+Road,+Vadodara,+Gujarat+391410"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-sm hover:text-primary underline cursor-pointer"
+    >
+     410, Nilamber Primero, Bhayli Vasna Road, Vadodara, Gujarat 391410, India
+ 
+    </a>
+
+    {/*  Hover Map Popup */}
+    <div className="absolute left-0 top-6 z-50 hidden group-hover:block">
+      <div className="w-[260px] h-[180px] rounded-md overflow-hidden shadow-lg border bg-white">
+        <iframe
+          src="https://www.google.com/maps?q=410,+Nilamber+Primero,+Bhayli+Vasna+Road,+Vadodara,+Gujarat+391410&output=embed"
+          className="w-full h-full border-0"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
                 </div>
 
                 {/* Contact Form */}
@@ -235,13 +378,17 @@ const CandidateContact = () => {
                       required
                       placeholder="Your Name"
                       className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
-                    />
+                        value={formDataState.name}
+                        onChange={handleChange}
+                   />
                     <input
                       type="email"
                       name="email"
                       required
                       placeholder="Email Address"
                       className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
+                     value={formDataState.email}
+                      onChange={handleChange}
                     />
                   </div>
                   <input
@@ -249,19 +396,25 @@ const CandidateContact = () => {
                     name="phone"
                     placeholder="Phone Number"
                     className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
+                    value={formDataState.phone}
+                   onChange={handleChange}
                   />
                   <input
                     type="text"
-                    name="currentRole"
+                    name="current_role"
                     placeholder="Current Role / Position"
                     className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
-                  />
+                    value={formDataState.current_role}
+                   onChange={handleChange}
+                 />
                   <textarea
                     name="message"
                     required
                     rows={4}
                     placeholder="Tell us about your career aspirations and ideal role..."
                     className="w-full bg-card border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors resize-none"
+                     value={formDataState.message}
+                    onChange={handleChange}
                   />
                   <div className="relative">
                     <input
@@ -270,7 +423,7 @@ const CandidateContact = () => {
                       name="resume"
                       accept=".pdf,.doc,.docx"
                       onChange={handleFileChange}
-                      className="hidden"
+                       className="hidden"
                     />
                     <label
                       htmlFor="resume"
@@ -298,113 +451,15 @@ const CandidateContact = () => {
                       <Link to="/privacy-policy" className="text-primary underline hover:no-underline">Privacy Policy</Link>.
                     </span>
                   </label>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || isSubmitted}
-                    className="btn-luxury-filled flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {isSubmitted ? (
-                      <>
-                        <CheckCircle size={16} />
-                        Submitted
-                      </>
-                    ) : isSubmitting ? (
-                      "Submitting..."
-                    ) : (
-                      <>
-                        <Send size={16} />
-                        Submit Profile
-                      </>
-                    )}
-                  </button>
+                  <button type="submit"  className="btn-luxury-filled w-full">
+                        Submit
+                    </button>
                 </form>
               </motion.div>
             </div>
           </div>
         </section>
       </main>
-      
-      {/* Custom Footer */}
-      <footer className="bg-background py-12 border-t border-border">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Text Logo */}
-            <Link to="/" className="flex items-center">
-              <span className="font-serif text-2xl">
-                <span className="text-primary italic">Luxe</span>
-                <span className="text-foreground">Hire</span>
-              </span>
-            </Link>
-
-            {/* Links */}
-            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <Link to="/#about" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                About
-              </Link>
-              <Link to="/#for-clients" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                For Brands
-              </Link>
-              <Link to="/#for-candidates" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                For Talent
-              </Link>
-              <Link to="/#contact" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                Contact
-              </Link>
-              <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                Privacy Policy
-              </Link>
-              <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                Cookie Policy
-              </Link>
-              <Link to="/terms" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                Terms of Service
-              </Link>
-              <Link to="/cookie-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide">
-                Cookie Settings
-              </Link>
-            </nav>
-
-            {/* Social */}
-            <div className="flex items-center gap-3">
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={14} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram size={14} />
-              </a>
-              <a
-                href="mailto:hello@luxehire.co"
-                className="w-8 h-8 rounded-sm border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-                aria-label="Email"
-              >
-                <Mail size={14} />
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-border/50 text-center space-y-1">
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} LuxeHire. All rights reserved.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Operated by Devloops Technologies Pvt. Ltd. · Privacy:{" "}
-              <a href="mailto:privacy@luxehire.co" className="text-primary hover:underline">privacy@luxehire.co</a>
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

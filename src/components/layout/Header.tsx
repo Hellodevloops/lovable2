@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "For Brands", href: "#for-clients" },
-  { label: "For Candidates", href: "#for-candidates" },
-  { label: "Who We Are", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/" },
+  { label: "For Brands", href: "/for-clients" },
+  { label: "For Candidates", href: "/for-candidates" },
+  { label: "Who We Are", href: "/whoweare" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const Header = () => {
@@ -37,7 +37,7 @@ export const Header = () => {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Text Logo */}
-            <a href="#home" className="flex items-center">
+            <a href="/" className="flex items-center">
               <span className="font-serif text-2xl lg:text-3xl">
                 <span className="text-primary italic">Luxe</span>
                 <span className="text-foreground">Hire</span>
@@ -59,7 +59,7 @@ export const Header = () => {
 
             {/* CTA Button */}
             <a 
-              href="#contact" 
+              href="/contact" 
               className="hidden lg:block px-6 py-3 bg-[#1a2332] text-white text-xs font-medium tracking-wider uppercase hover:bg-[#2a3342] transition-colors duration-300"
             >
               Hire With Us
@@ -102,7 +102,7 @@ export const Header = () => {
                 </motion.a>
               ))}
               <a
-                href="#contact"
+                href="/contact"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="px-6 py-3 bg-[#1a2332] text-white text-sm font-medium tracking-wider uppercase text-center mt-4"
               >

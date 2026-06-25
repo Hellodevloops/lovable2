@@ -176,7 +176,7 @@ const DataProtection = () => {
         </div>
       </main>
 
-      <Footer />
+    
     </div>
   );
 };

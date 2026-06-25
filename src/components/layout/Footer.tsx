@@ -17,31 +17,31 @@ export const Footer = () => {
           {/* Links */}
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <a
-              href="https://luxehire.co/#about"
+              href="/about"
               className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               About
             </a>
             <a
-              href="https://luxehire.co/#for-clients"
+              href="/for-clients"
               className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               For Brands
             </a>
             <a
-              href="https://luxehire.co/#for-candidates"
+              href="/for-candidates"
               className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               For Talent
             </a>
             <a
-              href="https://luxehire.co/#contact"
+              href="/contact"
               className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               Contact
             </a>
             <Link
-              to="/who-we-are"
+              to="/whoweare"
               className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wide"
             >
               Who We Are

@@ -10,53 +10,83 @@ import { db, initDb } from "./db.js";
 import { authMiddleware, generateToken, sanitizeObject } from "./auth.js";
 import bcrypt from "bcryptjs";
 import UAParser from "ua-parser-js";
+import multer from "multer";
+import fs from "fs";
 
 dotenv.config();
 
-const app = express();
+const app = express(); // ✅ MUST BE FIRST
 const PORT = process.env.PORT || 4000;
 
+/* ================= FILE PATH SETUP ================= */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientDistPath = path.join(__dirname, "..", "dist");
 
+/* ================= INIT DB ================= */
 initDb();
 
-const cspDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
-cspDirectives["img-src"] = [
-  ...(cspDirectives["img-src"] || []),
-  "https://purecatamphetamine.github.io",
-];
+const uploadDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+} 
+
+/* ================= MULTER (FILE UPLOAD) ================= */
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads"); // ✅ must match folder name
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+/* ================= MIDDLEWARE ================= */
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 app.use(
   helmet({
     contentSecurityPolicy: {
-      directives: cspDirectives,
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://purecatamphetamine.github.io",
+        ],
+      },
     },
   })
 );
+
 app.use(
   cors({
-    origin: true, // reflect request origin
+    origin: true,
     credentials: true,
   })
 );
-app.use(express.json());
+
 app.use(morgan("dev"));
 
-// Rate limiting for contact form
+/* ================= RATE LIMIT ================= */
 const contactLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // limit each IP
-  message: "Too many contact requests from this IP, please try again later.",
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: "Too many requests, please try again later.",
 });
 
+/* ================= HELPER ================= */
 function getClientIp(req) {
   const forwarded =
     req.headers["x-forwarded-for"] ||
     req.headers["x-real-ip"] ||
     req.connection?.remoteAddress ||
     req.socket?.remoteAddress;
+
   if (!forwarded) return "";
   if (typeof forwarded === "string") {
     return forwarded.split(",")[0].trim();
@@ -64,12 +94,12 @@ function getClientIp(req) {
   return forwarded[0];
 }
 
-// Healthcheck
+/* ================= HEALTH ================= */
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-// Auth: POST /api/login
+/* ================= LOGIN ================= */
 app.post("/api/login", (req, res) => {
   const body = sanitizeObject(req.body);
   const { email, password } = body;
@@ -78,41 +108,27 @@ app.post("/api/login", (req, res) => {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  db.get(
-    "SELECT * FROM users WHERE email = ?",
-    [email],
-    (err, user) => {
-      if (err) {
-        console.error("Login DB error", err);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
+  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
+    if (err) return res.status(500).json({ message: "Server error" });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-      const valid = bcrypt.compareSync(password, user.password);
-      if (!valid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
+    const valid = bcrypt.compareSync(password, user.password);
+    if (!valid)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-      const token = generateToken(user);
-      return res.json({
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      });
-    }
-  );
+    const token = generateToken(user);
+
+    res.json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email },
+    });
+  });
 });
 
-// Contact: POST /api/contact
+/* ================= CONTACT API ================= */
 app.post("/api/contact", contactLimiter, (req, res) => {
   const ipAddress = getClientIp(req);
-  const headers = req.headers;
-  const userAgent = headers["user-agent"] || "";
+  const userAgent = req.headers["user-agent"] || "";
 
   const parser = new UAParser(userAgent);
   const uaResult = parser.getResult();
@@ -140,19 +156,17 @@ app.post("/api/contact", contactLimiter, (req, res) => {
   const browser = uaResult.browser?.name || "";
   const os = uaResult.os?.name || "";
   const deviceType =
-    clientDeviceType ||
-    uaResult.device?.type ||
-    "desktop";
+    clientDeviceType || uaResult.device?.type || "desktop";
 
   db.run(
     `
-      INSERT INTO contacts (
-        name, email, phone, subject, message,
-        ip_address, browser, os, device_type,
-        screen_resolution, language, timezone,
-        referrer, user_agent
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO contacts (
+      name, email, phone, subject, message,
+      ip_address, browser, os, device_type,
+      screen_resolution, language, timezone,
+      referrer, user_agent
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       name,
@@ -172,121 +186,136 @@ app.post("/api/contact", contactLimiter, (req, res) => {
     ],
     function (err) {
       if (err) {
-        console.error("Error inserting contact", err);
+        console.error(err);
         return res.status(500).json({ message: "Failed to save contact" });
       }
-      return res.status(201).json({ id: this.lastID, message: "Contact saved" });
+      res.status(201).json({ message: "Contact saved" });
     }
   );
 });
+app.delete("/api/contacts/:id", (req, res) => {
+  const { id } = req.params;
 
-// Protected: GET /api/contacts
-app.get("/api/contacts", authMiddleware, (req, res) => {
-  const { search = "", deviceType = "", page = "1", limit = "10" } =
-    req.query || {};
+  db.run("DELETE FROM contacts WHERE id = ?", [id], function (err) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to delete contact" });
+    }
 
-  const pageNum = Math.max(parseInt(page, 10) || 1, 1);
-  const pageSize = Math.max(parseInt(limit, 10) || 10, 1);
-  const offset = (pageNum - 1) * pageSize;
+    res.json({ message: "Contact deleted successfully" });
+  });
+});
 
-  const params = [];
-  const where = [];
+/* ================= ✅ CANDIDATE API (WITH RESUME) ================= */
+app.post("/api/candidate", upload.single("resume"), (req, res) => {
+  try {
+    const { name, email, phone, current_role, message } = req.body;
+    const file = req.file;
 
-  if (search) {
-    where.push("(name LIKE ? OR email LIKE ?)");
-    const like = `%${search}%`;
-    params.push(like, like);
-  }
+    // ✅ Check required fields
+    if (!name || !email) {
+      return res.status(400).json({ message: "Name & Email required" });
+    }
 
-  if (deviceType) {
-    where.push("device_type = ?");
-    params.push(deviceType);
-  }
+    if (!file) {
+      return res.status(400).json({ message: "Resume file is required" });
+    }
 
-  const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
+    const resumePath = file.path.replace(/\\/g, "/"); // handle Windows paths
 
-  db.get(
-    `SELECT COUNT(*) as total FROM contacts ${whereClause}`,
-    params,
-    (countErr, countRow) => {
-      if (countErr) {
-        console.error("Count contacts error", countErr);
-        return res.status(500).json({ message: "Failed to fetch contacts" });
-      }
-
-      db.all(
-        `
-        SELECT *
-        FROM contacts
-        ${whereClause}
-        ORDER BY created_at DESC
-        LIMIT ? OFFSET ?
-      `,
-        [...params, pageSize, offset],
-        (err, rows) => {
-          if (err) {
-            console.error("List contacts error", err);
-            return res.status(500).json({ message: "Failed to fetch contacts" });
-          }
-
-          return res.json({
-            data: rows,
-            total: countRow?.total || 0,
-            page: pageNum,
-            limit: pageSize,
-          });
+    db.run(
+      `INSERT INTO candidates (name, email, phone, current_role, message, resume)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [name, email, phone || "", current_role || "", message || "", resumePath],
+      function (err) {
+        if (err) {
+          console.error("DB ERROR:", err);
+          return res.status(500).json({ error: err.message });
         }
-      );
-    }
-  );
-});
 
-// Protected: GET /api/contacts/:id
-app.get("/api/contacts/:id", authMiddleware, (req, res) => {
+        const newCandidate = {
+          id: this.lastID,
+          name,
+          email,
+          phone: phone || "",
+          current_role: current_role || "",
+          message: message || "",
+          resume: resumePath,
+          created_at: new Date().toISOString(),
+        };
+
+        // ✅ Return the new candidate so frontend can update immediately
+        res.status(201).json({
+          message: "Candidate saved successfully",
+          candidate: newCandidate,
+        });
+      }
+    );
+  } catch (error) {
+    console.error("SERVER ERROR:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+app.get("/api/candidates", (req, res) => {
+  db.all("SELECT * FROM candidates", [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+app.delete("/api/candidates/:id", (req, res) => {
   const { id } = req.params;
 
-  db.get(
-    "SELECT * FROM contacts WHERE id = ?",
-    [id],
-    (err, row) => {
-      if (err) {
-        console.error("Get contact error", err);
-        return res.status(500).json({ message: "Failed to fetch contact" });
-      }
-      if (!row) {
-        return res.status(404).json({ message: "Contact not found" });
-      }
-      return res.json(row);
+  db.run("DELETE FROM candidates WHERE id = ?", [id], function (err) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to delete candidate" });
     }
-  );
+
+    res.json({ message: "Candidate deleted successfully" });
+  });
 });
 
-// Protected: DELETE /api/contacts/:id
-app.delete("/api/contacts/:id", authMiddleware, (req, res) => {
+app.get("/api/candidates/:id/resume", (req, res) => {
   const { id } = req.params;
-  db.run(
-    "DELETE FROM contacts WHERE id = ?",
-    [id],
-    function (err) {
-      if (err) {
-        console.error("Delete contact error", err);
-        return res.status(500).json({ message: "Failed to delete contact" });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ message: "Contact not found" });
-      }
-      return res.json({ message: "Contact deleted" });
+  const uploadsRoot = path.join(__dirname, "uploads");
+
+  db.get("SELECT resume FROM candidates WHERE id = ?", [id], (err, row) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Failed to fetch resume" });
     }
-  );
+
+    if (!row?.resume) {
+      return res.status(404).json({ message: "Resume not found" });
+    }
+
+    const resumePath = row.resume.replace(/\\/g, "/");
+    const absolutePath = path.resolve(__dirname, resumePath);
+
+    if (!absolutePath.startsWith(uploadsRoot) || !fs.existsSync(absolutePath)) {
+      return res.status(404).json({ message: "Resume file not found" });
+    }
+
+    res.download(absolutePath, path.basename(absolutePath));
+  });
+});
+/* ================= PROTECTED ROUTES ================= */
+app.get("/api/contacts", (req, res) => {
+  db.all("SELECT * FROM contacts ORDER BY created_at DESC", [], (err, rows) => {
+    if (err) return res.status(500).json({ message: "Error fetching" });
+    res.json(rows);
+  });
 });
 
-// Serve built frontend (Vite) from /dist when running in production
+/* ================= STATIC FRONTEND ================= */
 app.use(express.static(clientDistPath));
 app.get("*", (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
+/* ================= START SERVER ================= */
 app.listen(PORT, () => {
-  console.log(`API server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
-

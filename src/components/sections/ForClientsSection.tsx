@@ -88,7 +88,7 @@ export const ForClientsSection = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-center mt-12"
         >
-          <a href="#contact" className="btn-luxury-filled inline-block">
+          <a href="/contact" className="btn-luxury-filled inline-block">
             Discuss Your Requirements
           </a>
         </motion.div>

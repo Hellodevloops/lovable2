@@ -3,24 +3,31 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect, useCallback } from "react";
 
 const brands = [
-  { name: "Bombaim", logo: "/assets/brands/Bombaim-removebg-preview.png", logoClassName: "scale-[2]" },
-  { name: "The Collective", logo: "/assets/brands/the_collective_640x360_4bb672e857-removebg-preview.png", logoClassName: "scale-[2.5]" },
-  { name: "Giorgio Armani", logo: "/assets/brands/Giorgio-Armani-logo-768x432-removebg-preview.png", logoClassName: "scale-[1.7]" },
-  { name: "Jade by Monica & Karishma", logo: "/assets/brands/Jade by monica and karishma -removebg-preview.png", logoClassName: "scale-[1.7]" },
-  { name: "Versace", logo: "/assets/brands/versace_rgb_black-removebg-preview.png", logoClassName: "scale-[2.8]" },
+  { name: "Bombaim", logo: "/assets/brands/Bombaim-removebg-preview.png", logoClassName: "scale-[1.5]" },
+  { name: "The Collective", logo: "/assets/brands/the_collective_640x360_4bb672e857-removebg-preview.png", logoClassName: "scale-[1.8]" },
+  { name: "Giorgio Armani", logo: "/assets/brands/Giorgio-Armani-logo-768x432-removebg-preview.png", logoClassName: "scale-[1.3]" },
+  // { name: "Jade by Monica & Karishma", logo: "/assets/brands/Jade by monica and karishma -removebg-preview.png", logoClassName: "scale-[1.7]" },
+  { name: "Versace", logo: "/assets/brands/versace_rgb_black-removebg-preview.png", logoClassName: "scale-[1.8]" },
   { name: "Good Earth", logo: "/assets/brands/goodearth-removebg-preview.png" },
   { name: "Zegna", logo: "/assets/brands/Zegna-Logo.png", logoClassName: "scale-[1]" },
-  { name: "Golden Goose", logo: "/assets/brands/goldengoose.png", logoClassName: "scale-[3.2]" },
+  { name: "Golden Goose", logo: "/assets/brands/goldengoose.png", logoClassName: "scale-[2.2]" },
   { name: "Valentino", logo: "/assets/brands/Valentino-Logo-removebg-preview.png" },
   { name: "Abu Jani Sandeep Khosla", logo: "/assets/brands/AbuJaani Sandeep Khosla-NEW-LOGO-removebg-preview.png", logoClassName: "scale-110" },
   { name: "Le Mill", logo: "/assets/brands/lemill-removebg-preview.png", logoClassName: "scale-125" },
-  { name: "Balenciaga", logo: "/assets/brands/Balenciaga-Logo.wine-removebg-preview.png", logoClassName: "scale-[2.9]" },
+  { name: "Balenciaga", logo: "/assets/brands/Balenciaga-Logo.wine-removebg-preview.png", logoClassName: "scale-[1.5]" },
   { name: "Manish Malhotra", logo: "/assets/brands/Manish Malhotra1440x800-removebg-preview.png", logoClassName: "scale-125" },
   { name: "Rolex", logo: "/assets/brands/rolex.com logo11.png", logoClassName: "scale-110" },
-  { name: "Sabyasachi", logo: "/assets/brands/sabyasachi.com_logo27-removebg-preview.png", logoClassName: "scale-[1.2]" },
-  { name: "Galeries Lafayette", logo: "/assets/brands/Galeries-Lafayette-logo-removebg-preview.png", logoClassName: "scale-[2.4]" },
-  { name: "Christian Louboutin", logo: "/assets/brands/christian-louboutin-logo-png_seeklogo-320816-removebg-preview.png", logoClassName: "scale-[2.1]" },
+  { name: "Sabyasachi", logo: "/assets/brands/sabyasachi.com_logo27-removebg-preview.png", logoClassName: "scale-110 origin-center" },
+  { name: "Galeries Lafayette", logo: "/assets/brands/Galeries-Lafayette-logo-removebg-preview.png", logoClassName: "scale-[2.1] origin-center" },
+  { name: "Christian Louboutin", logo: "/assets/brands/christian-louboutin-logo-png_seeklogo-320816-removebg-preview.png", logoClassName: "scale-[1.85] origin-center" },
   { name: "Tiffany & Co.", logo: "/assets/brands/tiffany-co-logo-.png" },
+  { name: "Amiri", logo: "/assets/brands/amiri-logo-lh.png", logoClassName: "scale-[1.3]" },
+  { name: "Art of Time", logo: "/assets/brands/art-of-time-removebg-preview.png", logoClassName: "scale-[1.5]" },
+  { name: "Ogaan", logo: "/assets/brands/OGAAN.png", logoClassName: "scale-[0.75] origin-center" },
+  { name: "LVMH", logo: "/assets/brands/lvmh-removebg-preview.png", logoClassName: "scale-[0.75] brightness-0 origin-center" },
+  { name: "Bvlgari", logo: "/assets/brands/bvlgari-removebg-preview.png", logoClassName: "brightness-0" },
+  { name: "Amaris", logo: "/assets/brands/amari-logo-lh.png", logoClassName: "scale-[1.1] origin-bottom" },
+  { name: "Tarun Tahiliani", logo: "/assets/brands/TT-lh.png", logoClassName: "scale-[2.5] origin-center -translate-y-2" },
 ];
 
 export const BrandsSection = () => {
@@ -53,8 +60,9 @@ export const BrandsSection = () => {
     // Calculate current position from animation position
     const currentAnimPos = animationPositionRef.current;
 
-    // Use dynamic width or fallback to 280 to prevent division by zero
-    const itemWidth = brandWidth || 280;
+    // Use full set width; per-item stride is an average for navigation snapping
+    const setWidth = brandWidth || 260 * brands.length;
+    const itemWidth = setWidth / brands.length;
     const totalContentWidth = itemWidth * brands.length;
 
     // Normalize position to positive index equivalent
@@ -79,7 +87,7 @@ export const BrandsSection = () => {
     setIsPaused(true);
 
     const currentAnimPos = animationPositionRef.current;
-    const itemWidth = brandWidth || 280;
+    const itemWidth = brandWidth || 260;
     const totalContentWidth = itemWidth * brands.length;
 
     // Determine current index based on nearest item
@@ -129,9 +137,19 @@ export const BrandsSection = () => {
     }, 1000);
   }, [brandWidth]);
 
-  // Calculate brand width on mount with debouncing
+  // Calculate brand stride (slot width + gap) on mount with debouncing
   useEffect(() => {
     const calculateBrandWidth = () => {
+      if (
+        brandElementRef.current?.nextElementSibling instanceof HTMLElement
+      ) {
+        const firstLeft = brandElementRef.current.getBoundingClientRect().left;
+        const secondLeft =
+          brandElementRef.current.nextElementSibling.getBoundingClientRect().left;
+        setBrandWidth(secondLeft - firstLeft);
+        return;
+      }
+
       if (brandElementRef.current) {
         setBrandWidth(brandElementRef.current.clientWidth);
       }
@@ -328,43 +346,46 @@ export const BrandsSection = () => {
           className="flex"
         >
           {/* First set of brands */}
-          <div className="flex shrink-0">
+          <div className="flex shrink-0 gap-10 md:gap-12 lg:gap-14">
             {brands.map((brand, index) => (
               <div
                 key={`first-${index}`}
                 ref={index === 0 ? brandElementRef : undefined}
-                className="brand-item flex w-[240px] shrink-0 items-center justify-center px-10 md:w-[260px] md:px-12 lg:w-[280px]"
+                className="brand-item flex w-[260px] shrink-0 items-center justify-center"
               >
-                <img
-                  src={brand.logo}
-                  alt={brand.name}
-                  className={`h-12 w-auto max-w-[180px] object-contain md:h-14 lg:h-16 ${brand.logoClassName ?? ""}`}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                  loading="lazy"
-                />
+                <div className="flex h-14 w-full max-w-[190px] items-center justify-center md:h-16 md:max-w-[205px] lg:h-[4.5rem] lg:max-w-[220px]">
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className={`max-h-full max-w-full object-contain object-center origin-center ${brand.logoClassName ?? ""}`}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                    loading="lazy"
+                  />
+                </div>
               </div>
             ))}
           </div>
           {/* Duplicate for seamless loop */}
-          <div className="flex shrink-0">
+          <div className="flex shrink-0 gap-10 md:gap-12 lg:gap-14">
             {brands.map((brand, index) => (
               <div
                 key={`second-${index}`}
-                className="brand-item flex w-[240px] shrink-0 items-center justify-center px-10 md:w-[260px] md:px-12 lg:w-[280px]"
+                className="brand-item flex w-[260px] shrink-0 items-center justify-center"
               >
-                <img
-                  src={brand.logo}
-                  alt={brand.name}
-                  className={`h-12 w-auto max-w-[180px] object-contain md:h-14 lg:h-16 ${brand.logoClassName ?? ""}`}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                  loading="lazy"
-                />
+                <div className="flex h-[90px] w-[220px] items-center justify-center">
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className={`max-h-[65px] max-w-[200px] object-contain object-center ${brand.logoClassName ?? ""}`}                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                    loading="lazy"
+                  />
+                </div>
               </div>
             ))}
           </div>

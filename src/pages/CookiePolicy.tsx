@@ -252,7 +252,7 @@ const CookiePolicy = () => {
         </div>
       </main>
 
-      <Footer />
+      
     </div>
   );
 };
