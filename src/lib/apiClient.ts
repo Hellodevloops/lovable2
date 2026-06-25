@@ -2,10 +2,11 @@ import axios from "axios";
 
 /* ================= BASE URL ================= */
 
-// If env exists → use it
-// Else fallback to localhost (important fix)
+// Production: same-origin (/api) when frontend + backend are served together
+// Development: localhost backend unless VITE_API_BASE_URL is set
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.PROD ? "" : "http://localhost:4000");
 
 export { API_BASE_URL };
 

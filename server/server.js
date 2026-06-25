@@ -53,10 +53,14 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "frame-src": ["'self'", "https://www.google.com", "https://maps.google.com"],
         "img-src": [
           "'self'",
           "data:",
           "https://purecatamphetamine.github.io",
+          "https://maps.googleapis.com",
+          "https://maps.gstatic.com",
+          "https://www.google.com",
         ],
       },
     },

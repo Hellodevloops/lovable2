@@ -9,6 +9,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci --include=dev
 
 COPY . .
+ENV VITE_API_BASE_URL=
 RUN npm run build
 
 FROM node:20-bullseye-slim AS base
