@@ -55,6 +55,7 @@ const AppLayout = () => {
         <Route path="/data-protection" element={<DataProtection />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/WhoWeAre" element={<WhoWeAre />} />
+        <Route path="/whoweare" element={<WhoWeAre />} />
         <Route path="/for-clients" element={<ForClients />} />
         <Route path="/for-candidates" element={<Candidates />} />
         <Route path="/contact" element={<Contact />} />

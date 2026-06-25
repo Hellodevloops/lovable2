@@ -25,13 +25,18 @@ import romilTrivediImage from "/assets/RomilTrivedi.jpeg";
   },
 ];
 
-export const LeadershipSection = () => {
+export const LeadershipSection = ({ compactTop = false }: { compactTop?: boolean }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="leadership" className="py-16 md:py-24 lg:py-32 relative bg-cream-dark">
-      <div className="section-divider mb-16 md:mb-24" />
+    <section
+      id="leadership"
+      className={`relative bg-cream-dark ${
+        compactTop ? "pt-6 pb-14 md:pt-8 md:pb-20" : "py-16 md:py-24 lg:py-32"
+      }`}
+    >
+      {!compactTop && <div className="section-divider mb-16 md:mb-24" />}
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         <motion.div
@@ -39,7 +44,9 @@ export const LeadershipSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto mb-12 md:mb-16"
+          className={`text-center max-w-3xl mx-auto ${
+            compactTop ? "mb-8 md:mb-10" : "mb-12 md:mb-16"
+          }`}
         >
           <p className="text-primary text-xs md:text-sm font-medium tracking-luxury uppercase mb-3 md:mb-4">
             Our Leadership
