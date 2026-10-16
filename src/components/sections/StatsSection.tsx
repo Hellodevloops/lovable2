@@ -44,7 +44,7 @@ const AnimatedCounter = ({ end, suffix = "", duration = 2, isInView }: CounterPr
 };
 
 const stats = [
-  { value: 200, suffix: "+", label: "Successful Placements" },
+  { value: 500, suffix: "+", label: "Successful Placements" },
   { value: 5, suffix: "+", label: "Years of Experience" },
   { value: 50, suffix: "+", label: "Luxury Brands Served" },
   { value: 95, suffix: "%", label: "Client Retention Rate" },
