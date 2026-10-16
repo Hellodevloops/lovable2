@@ -1,6 +1,6 @@
 ## Single Dockerfile for frontend + backend (Node + Express + Vite)
 
-FROM node:20-bullseye-slim AS frontend-builder
+FROM node:20-bookworm-slim AS frontend-builder
 
 WORKDIR /app
 
@@ -12,13 +12,13 @@ COPY . .
 ENV VITE_API_BASE_URL=
 RUN npm run build
 
-FROM node:20-bullseye-slim AS base
+FROM node:20-bookworm-slim AS base
 
 WORKDIR /app
 
-## System deps for sqlite3 native module
+## System deps for sqlite3 native module (bookworm avoids stale bullseye-security 404s)
 RUN apt-get update && \
-    apt-get install -y python3 make g++ && \
+    apt-get install -y --no-install-recommends python3 make g++ && \
     rm -rf /var/lib/apt/lists/*
 
 COPY server/package.json server/package-lock.json* ./server/
